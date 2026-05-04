@@ -55,6 +55,14 @@ create table if not exists public.settings (
   updated_at bigint not null
 );
 
+grant usage on schema public to anon, authenticated;
+grant select, insert, update, delete on public.messages to anon, authenticated;
+grant select, insert, update, delete on public.booth_photos to anon, authenticated;
+grant select, insert, update, delete on public.booth_videos to anon, authenticated;
+grant select, insert, update, delete on public.reactions to anon, authenticated;
+grant select, insert, update, delete on public.speech to anon, authenticated;
+grant select, insert, update, delete on public.settings to anon, authenticated;
+
 alter table public.messages enable row level security;
 alter table public.booth_photos enable row level security;
 alter table public.booth_videos enable row level security;
