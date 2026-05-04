@@ -1,0 +1,218 @@
+.main-wall {
+  min-height: 100vh;
+  padding: calc(var(--space-lg) + 56px) var(--space-lg) 110px;
+  max-width: 1500px;
+  margin: 0 auto;
+}
+
+/* ── Header ─────────────────────────────────── */
+.wall-header {
+  text-align: center;
+  padding: var(--space-xl) 0 var(--space-md);
+}
+
+.wall-title {
+  font-family: var(--font-heading);
+  font-size: 2rem;
+  color: var(--burgundy);
+  margin-bottom: var(--space-sm);
+}
+
+.wall-subtitle {
+  font-size: 1rem;
+  color: var(--text-medium);
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.wall-stats {
+  margin-top: var(--space-md);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+.wall-stat {
+  font-size: 0.82rem;
+  color: var(--gold-dark);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.wall-stat-dot {
+  color: var(--text-light);
+  font-size: 0.7rem;
+}
+
+/* ── Masonry grid ────────────────────────────── */
+.wall-masonry {
+  columns: 4;
+  column-gap: 14px;
+  padding-bottom: var(--space-lg);
+}
+
+.wall-masonry-item {
+  break-inside: avoid;
+  margin-bottom: 12px;
+  cursor: pointer;
+  position: relative;
+}
+
+.wall-masonry-item:nth-child(3n) {
+  margin-top: -10px;
+}
+
+.wall-masonry-item:nth-child(4n) {
+  margin-top: -6px;
+}
+
+/* ── Empty state ─────────────────────────────── */
+.wall-empty {
+  text-align: center;
+  padding: var(--space-3xl) var(--space-xl);
+  color: var(--text-medium);
+}
+
+.wall-empty-icon {
+  font-size: 4rem;
+  margin-bottom: var(--space-lg);
+  opacity: 0.6;
+}
+
+.wall-empty h3 {
+  font-family: var(--font-heading);
+  font-size: 1.3rem;
+  color: var(--text-dark);
+  margin-bottom: var(--space-sm);
+}
+
+.wall-empty p {
+  font-size: 0.95rem;
+  color: var(--text-light);
+}
+
+/* ── Load more ───────────────────────────────── */
+.wall-load-more {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: var(--space-xl);
+  color: var(--text-light);
+  font-size: 0.9rem;
+}
+
+.wall-load-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--border-subtle);
+  border-top-color: var(--burgundy);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── FAB group ───────────────────────────────── */
+.wall-fab-group {
+  position: fixed;
+  bottom: var(--space-xl);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: var(--space-md);
+  z-index: 50;
+}
+
+.wall-fab {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-xl);
+  border-radius: 50px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  box-shadow: var(--shadow-lg);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  border: none;
+  white-space: nowrap;
+}
+
+.wall-fab:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-xl);
+}
+
+.wall-fab:active {
+  transform: translateY(0);
+}
+
+.wall-fab-icon {
+  font-size: 1.15rem;
+}
+
+.wall-fab-message {
+  background: linear-gradient(135deg, var(--burgundy), var(--burgundy-dark));
+  color: var(--cream);
+}
+
+.wall-fab-message:hover {
+  background: linear-gradient(135deg, var(--burgundy-light), var(--burgundy));
+}
+
+.wall-fab-booth {
+  background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+  color: var(--text-dark);
+}
+
+.wall-fab-booth:hover {
+  background: linear-gradient(135deg, var(--gold-light), var(--gold));
+}
+
+/* ── Responsive ──────────────────────────────── */
+@media (max-width: 1024px) {
+  .wall-masonry {
+    columns: 3;
+    column-gap: 12px;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-wall {
+    padding: calc(var(--space-md) + 56px) var(--space-sm) 110px;
+  }
+
+  .wall-title {
+    font-size: 1.5rem;
+  }
+
+  .wall-masonry {
+    columns: 2;
+    column-gap: 10px;
+  }
+
+  .wall-fab-group {
+    bottom: var(--space-md);
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-sm);
+  }
+
+  .wall-fab {
+    min-width: 180px;
+    justify-content: center;
+    padding: var(--space-sm) var(--space-lg);
+    font-size: 0.88rem;
+  }
+}
+
+@media (max-width: 540px) {
+  .wall-masonry {
+    columns: 1;
+  }
+}

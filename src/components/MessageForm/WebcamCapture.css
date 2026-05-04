@@ -1,0 +1,212 @@
+.webcam-capture {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.webcam-video-container {
+  position: relative;
+  width: min(100%, 420px);
+  align-self: center;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: #1a1a1a;
+  aspect-ratio: 16 / 9;
+}
+
+.webcam-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transform: scaleX(-1);
+}
+
+.webcam-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  gap: var(--space-md);
+  font-size: 0.9rem;
+}
+
+.webcam-loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top-color: var(--gold);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.webcam-hint {
+  position: absolute;
+  bottom: var(--space-md);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  padding: var(--space-xs) var(--space-md);
+  border-radius: 20px;
+  font-size: 0.85rem;
+  animation: fadeIn 0.5s;
+  width: min(calc(100% - 16px), 360px);
+  text-align: center;
+}
+
+.webcam-face-indicator {
+  position: absolute;
+  top: var(--space-sm);
+  right: var(--space-sm);
+  background: rgba(91, 140, 90, 0.8);
+  color: white;
+  padding: 2px var(--space-sm);
+  border-radius: 12px;
+  font-size: 0.72rem;
+}
+
+.webcam-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  justify-content: center;
+}
+
+.webcam-btn {
+  flex: 1 1 170px;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all var(--transition-fast);
+  cursor: pointer;
+  border: none;
+}
+
+.webcam-btn-capture {
+  background: linear-gradient(135deg, var(--burgundy), var(--burgundy-dark));
+  color: var(--cream);
+  font-size: 1rem;
+}
+
+.webcam-btn-capture:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.webcam-btn-capture:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.webcam-btn-primary {
+  background: linear-gradient(135deg, var(--burgundy), var(--burgundy-dark));
+  color: var(--cream);
+}
+
+.webcam-btn-primary:hover {
+  transform: translateY(-1px);
+}
+
+.webcam-btn-secondary {
+  background: white;
+  color: var(--text-medium);
+  border: 1px solid var(--border-subtle);
+}
+
+.webcam-btn-secondary:hover {
+  border-color: var(--gold);
+  color: var(--text-dark);
+}
+
+.webcam-preview-result {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.webcam-result-img {
+  width: min(100%, 420px);
+  align-self: center;
+  border-radius: var(--radius-md);
+  border: 3px solid var(--cream);
+  box-shadow: var(--shadow-md);
+}
+
+.webcam-result-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  justify-content: center;
+}
+
+.webcam-result-hint {
+  font-size: 0.8rem;
+  color: var(--text-light);
+  font-style: italic;
+  text-align: center;
+  animation: fadeIn 0.5s ease;
+}
+
+.webcam-error {
+  text-align: center;
+  padding: var(--space-2xl);
+  color: var(--text-medium);
+}
+
+.webcam-error-icon {
+  font-size: 3rem;
+  margin-bottom: var(--space-md);
+  opacity: 0.5;
+}
+
+.webcam-error p {
+  font-weight: 600;
+  margin-bottom: var(--space-xs);
+}
+
+.webcam-error-detail {
+  font-size: 0.8rem;
+  color: var(--text-light);
+  display: block;
+  margin-bottom: var(--space-lg);
+}
+
+@media (min-width: 769px) {
+  .webcam-capture {
+    gap: clamp(var(--space-xs), 1.2vh, var(--space-sm));
+  }
+
+  .webcam-video-container {
+    width: min(100%, 400px);
+    max-height: min(34vh, 250px);
+  }
+}
+
+@media (max-height: 860px) and (min-width: 769px) {
+  .webcam-video-container {
+    width: min(100%, 360px);
+  }
+}
+
+@media (max-width: 640px) {
+  .webcam-actions,
+  .webcam-result-actions {
+    flex-direction: column;
+  }
+
+  .webcam-btn {
+    flex-basis: auto;
+  }
+}

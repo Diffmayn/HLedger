@@ -1,0 +1,87 @@
+.speech-editor {
+  background: var(--paper);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl);
+  box-shadow: var(--shadow-sm);
+}
+
+.speech-editor-header {
+  margin-bottom: var(--space-lg);
+}
+
+.speech-editor-header h3 {
+  font-family: var(--font-heading);
+  color: var(--burgundy);
+  font-size: 1.2rem;
+  margin-bottom: var(--space-xs);
+}
+
+.speech-editor-header p {
+  font-size: 0.85rem;
+  color: var(--text-medium);
+}
+
+.speech-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.speech-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.speech-group label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.speech-group input,
+.speech-group textarea {
+  padding: var(--space-sm) var(--space-md);
+  border: 1.5px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: white;
+  font-size: 0.95rem;
+  transition: border-color var(--transition-fast);
+  font-family: var(--font-body);
+  resize: vertical;
+}
+
+.speech-group input:focus,
+.speech-group textarea:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.15);
+}
+
+.speech-count {
+  font-size: 0.72rem;
+  color: var(--text-light);
+  text-align: right;
+}
+
+.speech-save-btn {
+  align-self: flex-start;
+  padding: var(--space-sm) var(--space-xl);
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, var(--burgundy), var(--burgundy-dark));
+  color: var(--cream);
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.speech-save-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.speech-save-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

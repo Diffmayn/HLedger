@@ -1,0 +1,78 @@
+/* ── Photo booth strip ──────────────────────────────────────────────────── */
+.photo-strip {
+  background: #1a0010;
+  border-radius: 6px;
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.55), 0 2px 8px rgba(0, 0, 0, 0.4);
+  width: 240px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+/* ── Header ─────────────────────────────────────────────────────────────── */
+.photo-strip-header {
+  background: #fffdf7;
+  text-align: center;
+  padding: 10px 12px 9px;
+  border-bottom: 3px solid var(--gold, #c9a84c);
+}
+
+.photo-strip-star {
+  font-size: 1rem;
+  color: var(--gold, #c9a84c);
+  display: block;
+  line-height: 1.2;
+  margin-bottom: 2px;
+}
+
+.photo-strip-header h3 {
+  font-family: var(--font-heading, Georgia, serif);
+  font-size: 1rem;
+  color: var(--burgundy, #2d0a1e);
+  margin: 0 0 2px;
+  line-height: 1.2;
+}
+
+.photo-strip-sub {
+  font-size: 0.6rem;
+  color: #7a5a4a;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* ── Frames — flush, connected ───────────────────────────────────────────── */
+.photo-strip-frames {
+  display: flex;
+  flex-direction: column;
+  /* No gap — dividers are part of each frame */
+}
+
+.photo-strip-frame {
+  position: relative;
+  overflow: hidden;
+  line-height: 0; /* eliminate inline gap under img */
+}
+
+.photo-strip-divider {
+  height: 4px;
+  background: #1a0010;
+}
+
+.photo-strip-frame img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  display: block;
+}
+
+/* ── Footer ─────────────────────────────────────────────────────────────── */
+.photo-strip-footer {
+  background: #fffdf7;
+  text-align: center;
+  font-size: 0.65rem;
+  color: #7a5a4a;
+  font-family: Georgia, serif;
+  padding: 8px 0 9px;
+  border-top: 3px solid var(--gold, #c9a84c);
+}

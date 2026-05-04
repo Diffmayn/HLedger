@@ -1,0 +1,110 @@
+.filter-selector {
+  background: rgba(60, 36, 21, 0.05);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md);
+  border: 1px solid var(--border-subtle);
+}
+
+.filter-categories {
+  display: flex;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-md);
+  overflow-x: auto;
+  padding-bottom: var(--space-xs);
+}
+
+.filter-cat-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-md);
+  border-radius: 20px;
+  font-size: 0.8rem;
+  color: var(--text-medium);
+  background: white;
+  border: 1px solid var(--border-subtle);
+  white-space: nowrap;
+  transition: all var(--transition-fast);
+  text-transform: capitalize;
+}
+
+.filter-cat-btn:hover {
+  border-color: var(--gold);
+  color: var(--text-dark);
+}
+
+.filter-cat-btn.active {
+  background: var(--burgundy);
+  color: var(--cream);
+  border-color: var(--burgundy);
+}
+
+.filter-cat-icon {
+  font-size: 1rem;
+}
+
+.filter-cat-label {
+  font-size: 0.75rem;
+}
+
+.filter-items {
+  display: flex;
+  gap: var(--space-sm);
+  overflow-x: auto;
+  padding: var(--space-xs) 0;
+}
+
+.filter-item {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: var(--space-sm);
+  border-radius: var(--radius-md);
+  border: 2px solid transparent;
+  background: white;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  width: 70px;
+}
+
+.filter-item:hover {
+  border-color: var(--gold-light);
+  transform: translateY(-2px);
+}
+
+.filter-item.active {
+  border-color: var(--gold);
+  background: rgba(201, 168, 76, 0.1);
+  box-shadow: 0 0 0 1px var(--gold);
+}
+
+.filter-thumb {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+}
+
+.filter-name {
+  font-size: 0.65rem;
+  color: var(--text-medium);
+  text-align: center;
+  line-height: 1.2;
+}
+
+.filter-clear-btn {
+  display: block;
+  margin: var(--space-sm) auto 0;
+  font-size: 0.8rem;
+  color: var(--burgundy);
+  padding: var(--space-xs) var(--space-md);
+  border-radius: 20px;
+  border: 1px solid var(--burgundy-light);
+  background: rgba(114, 47, 55, 0.05);
+  transition: all var(--transition-fast);
+}
+
+.filter-clear-btn:hover {
+  background: rgba(114, 47, 55, 0.1);
+}

@@ -1,0 +1,22 @@
+{
+  "name": "Jeannette's Guestbook",
+  "short_name": "Guestbook",
+  "description": "Digital guestbook celebrating Jeannette's 25th anniversary at Salling Group",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#FDF6E3",
+  "theme_color": "#722F37",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "icons.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

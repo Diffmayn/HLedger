@@ -1,0 +1,93 @@
+.video-capture {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.video-capture-header h3 {
+  margin: 0 0 4px;
+  color: var(--burgundy);
+}
+
+.video-capture-header p {
+  margin: 0;
+  color: var(--text-medium);
+  font-size: 0.85rem;
+}
+
+.video-capture-preview-wrap {
+  background: #140f12;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.video-capture-preview,
+.video-capture-player {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  background: #140f12;
+  display: block;
+}
+
+.video-capture-preview {
+  transform: scaleX(-1);
+}
+
+.video-capture-status-row,
+.video-capture-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  background: rgba(20, 15, 18, 0.88);
+  color: white;
+  font-size: 0.8rem;
+}
+
+.video-capture-status.is-recording {
+  color: #ffb4b8;
+  font-weight: 700;
+}
+
+.video-capture-actions {
+  display: flex;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+.video-capture-btn {
+  border: none;
+  border-radius: var(--radius-md);
+  padding: var(--space-sm) var(--space-md);
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.video-capture-btn-primary {
+  background: linear-gradient(135deg, var(--burgundy), var(--burgundy-dark));
+  color: var(--cream);
+}
+
+.video-capture-btn-stop {
+  background: linear-gradient(135deg, #7a1e2c, #4f0f19);
+  color: #fff;
+}
+
+.video-capture-btn-secondary {
+  background: white;
+  color: var(--text-dark);
+  border: 1px solid var(--border-subtle);
+}
+
+.video-capture-error {
+  margin: 0;
+  color: #a73238;
+  font-size: 0.85rem;
+}
+
+@media (max-width: 768px) {
+  .video-capture-actions {
+    flex-direction: column;
+  }
+}
