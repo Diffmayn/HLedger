@@ -117,7 +117,7 @@ export default function MainWall() {
             if (entry._type === 'photo') {
               return (
                 <div key={`p-${entry.id}`} className="wall-masonry-item">
-                  <BoothPhotoCard photo={entry} index={i} onClick={() => handleEntryClick(entry)} />
+                  <BoothPhotoCard photo={entry} index={i} onClick={() => handleEntryClick(entry)} onDelete={(id) => handleDelete('photo', id)} />
                 </div>
               )
             }

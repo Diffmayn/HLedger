@@ -1,6 +1,6 @@
 import './BoothPhotoCard.css'
 
-export default function BoothPhotoCard({ photo, index = 0, onClick, large = false }) {
+export default function BoothPhotoCard({ photo, index = 0, onClick, onDelete, large = false }) {
   const timeStr = new Date(photo.timestamp).toLocaleTimeString('da-DK', {
     hour: '2-digit',
     minute: '2-digit'
@@ -8,6 +8,13 @@ export default function BoothPhotoCard({ photo, index = 0, onClick, large = fals
 
   const isStrip = !!photo.isStrip
   const isInteractive = typeof onClick === 'function'
+
+  const handleDelete = (e) => {
+    e.stopPropagation()
+    if (window.confirm('Delete this photo? This cannot be undone.')) {
+      onDelete(photo.id)
+    }
+  }
 
   return (
     <div
@@ -19,6 +26,14 @@ export default function BoothPhotoCard({ photo, index = 0, onClick, large = fals
       aria-label={isInteractive ? 'View booth photo' : undefined}
     >
       <div className="booth-card-badge">📸</div>
+      {typeof onDelete === 'function' && (
+        <button
+          className="booth-card-delete"
+          onClick={handleDelete}
+          aria-label="Delete photo"
+          title="Delete photo"
+        >✕</button>
+      )}
       <div className="booth-card-img-wrap">
         <img
           src={photo.photoDataUrl}
