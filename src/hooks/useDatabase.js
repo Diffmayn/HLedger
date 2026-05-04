@@ -266,7 +266,8 @@ export function useBoothPhotos() {
           .single()
 
         if (error) {
-          throw new Error('Unable to save this booth photo to the shared guestbook right now.')
+          console.error('[useDatabase] Failed to insert shared booth photo:', error)
+          throw new Error(`Unable to save shared booth photo: ${error.message || error.code || 'unknown error'}`)
         }
 
         return data.id
@@ -277,6 +278,9 @@ export function useBoothPhotos() {
     } catch (error) {
       if (error?.name === 'QuotaExceededError') {
         throw new Error('Storage is full. Please remove some saved photos and try again.')
+      }
+      if (error?.message?.startsWith('Unable to save shared booth photo:')) {
+        throw error
       }
       throw new Error('Unable to save photo right now. Please try again.')
     }
