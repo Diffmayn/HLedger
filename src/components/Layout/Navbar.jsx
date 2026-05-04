@@ -4,6 +4,7 @@ import './Navbar.css'
 export default function Navbar() {
   const location = useLocation()
   const isPresentation = location.pathname === '/present'
+  const presentationHref = `${import.meta.env.BASE_URL}present`
 
   if (isPresentation) return null
 
@@ -29,7 +30,7 @@ export default function Navbar() {
           <span className="nav-icon">📕</span>
           <span>Export Book</span>
         </NavLink>
-        <a href="/present" target="_blank" rel="noopener" className="nav-link nav-link-present">
+        <a href={presentationHref} target="_blank" rel="noopener" className="nav-link nav-link-present">
           <span className="nav-icon">🖥️</span>
           <span>Presentation</span>
         </a>

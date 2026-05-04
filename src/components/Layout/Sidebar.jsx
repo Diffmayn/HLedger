@@ -8,6 +8,7 @@ export default function Sidebar() {
   const location = useLocation()
 
   const isPresentation = location.pathname === '/present'
+  const presentationHref = `${import.meta.env.BASE_URL}present`
 
   useEffect(() => {
     const media = window.matchMedia('(min-width: 769px)')
@@ -73,7 +74,7 @@ export default function Sidebar() {
             <span className="sidebar-icon">📕</span>
             <span>Export Book</span>
           </NavLink>
-          <a href="/present" target="_blank" rel="noopener" className="sidebar-link sidebar-link-present">
+          <a href={presentationHref} target="_blank" rel="noopener" className="sidebar-link sidebar-link-present">
             <span className="sidebar-icon">🖥️</span>
             <span>Presentation</span>
           </a>
