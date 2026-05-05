@@ -1,9 +1,7 @@
 import { useEffect, useState } from 'react'
-import { useSpeech } from '../../hooks/useDatabase'
 import './SpeechEditor.css'
 
-export default function SpeechEditor() {
-  const { speech, saveSpeech } = useSpeech()
+export default function SpeechEditor({ speech, saveSpeech }) {
   const [title, setTitle] = useState(speech?.title ?? 'A Few Words from the Boss')
   const [body, setBody] = useState(speech?.body ?? '')
   const [author, setAuthor] = useState(speech?.author ?? '')

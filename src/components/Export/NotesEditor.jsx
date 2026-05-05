@@ -1,11 +1,8 @@
 import { useEffect, useState } from 'react'
-import { useSettings } from '../../hooks/useDatabase'
 import './SpeechEditor.css'
 
-export default function NotesEditor() {
-  const { getSetting, setSetting } = useSettings()
-  const storedNotes = getSetting('ebookNotes') || ''
-  const [notes, setNotes] = useState(storedNotes)
+export default function NotesEditor({ notes: storedNotes, onSave }) {
+  const [notes, setNotes] = useState(storedNotes || '')
   const [saved, setSaved] = useState(false)
 
   useEffect(() => {
@@ -13,7 +10,7 @@ export default function NotesEditor() {
   }, [storedNotes])
 
   const handleSave = async () => {
-    await setSetting('ebookNotes', notes.trim())
+    await onSave(notes.trim())
     setSaved(true)
     setTimeout(() => setSaved(false), 2000)
   }

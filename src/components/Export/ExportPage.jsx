@@ -91,8 +91,8 @@ export default function ExportPage() {
   const { messages } = useMessages()
   const { photos: boothPhotos } = useBoothPhotos()
   const { videos: boothVideos } = useBoothVideos()
-  const { speech } = useSpeech()
-  const { getSetting } = useSettings()
+  const { speech, saveSpeech } = useSpeech()
+  const { getSetting, setSetting } = useSettings()
   const notes = getSetting('ebookNotes') || ''
 
   const [isGenerating, setIsGenerating] = useState(false)
@@ -364,10 +364,10 @@ export default function ExportPage() {
 
           <div className="export-editors">
             <div className="export-section">
-              <SpeechEditor />
+              <SpeechEditor speech={speech} saveSpeech={saveSpeech} />
             </div>
             <div className="export-section">
-              <NotesEditor />
+              <NotesEditor notes={notes} onSave={(val) => setSetting('ebookNotes', val)} />
             </div>
           </div>
         </div>
