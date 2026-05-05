@@ -13,26 +13,40 @@ function addSectionWithPageBreak(sectionBlocks, section) {
 
 function buildCoverPage() {
   return [
-    { text: '', margin: [0, 120, 0, 0] },
+    {
+      canvas: [
+        // Full-page burgundy background
+        { type: 'rect', x: -40, y: -40, w: 595, h: 842, color: '#5A252C' }
+      ],
+      absolutePosition: { x: 0, y: 0 }
+    },
+    // Gold top ornament rule
+    {
+      canvas: [
+        { type: 'line', x1: 140, y1: 0, x2: 375, y2: 0, lineWidth: 1.5, lineColor: '#C9A84C' }
+      ],
+      margin: [0, 160, 0, 30]
+    },
     {
       text: 'Celebrating',
       alignment: 'center',
-      fontSize: 18,
-      color: '#9B4D56',
-      margin: [0, 0, 0, 5]
+      fontSize: 14,
+      color: '#E8D48B',
+      letterSpacing: 3,
+      margin: [0, 0, 0, 6]
     },
     {
       text: "Jeannette's",
       alignment: 'center',
-      fontSize: 38,
+      fontSize: 42,
       bold: true,
-      color: '#722F37',
-      margin: [0, 0, 0, 5]
+      color: '#FDF6E3',
+      margin: [0, 0, 0, 4]
     },
     {
-      text: '25 Years',
+      text: '25 Wonderful Years',
       alignment: 'center',
-      fontSize: 32,
+      fontSize: 22,
       bold: true,
       color: '#C9A84C',
       margin: [0, 0, 0, 10]
@@ -40,22 +54,30 @@ function buildCoverPage() {
     {
       text: 'at Salling Group',
       alignment: 'center',
-      fontSize: 20,
-      color: '#6B5244',
+      fontSize: 14,
+      color: '#C8B09A',
       margin: [0, 0, 0, 30]
     },
     {
       canvas: [
-        { type: 'line', x1: 170, y1: 0, x2: 345, y2: 0, lineWidth: 2, lineColor: '#C9A84C' }
+        { type: 'line', x1: 140, y1: 0, x2: 375, y2: 0, lineWidth: 1.5, lineColor: '#C9A84C' }
       ],
       margin: [0, 0, 0, 30]
     },
     {
       text: 'A collection of warm wishes, memories\nand celebrations from colleagues & friends',
       alignment: 'center',
-      fontSize: 12,
+      fontSize: 11,
       italics: true,
-      color: '#9B8A7C'
+      color: '#C8B09A',
+      lineHeight: 1.6
+    },
+    {
+      text: new Date().toLocaleDateString('da-DK', { year: 'numeric', month: 'long' }),
+      alignment: 'center',
+      fontSize: 9,
+      color: '#9B8A7C',
+      margin: [0, 40, 0, 0]
     }
   ]
 }
@@ -255,26 +277,86 @@ function buildBoothSection(photos) {
     }
   ]
 
-  photos.forEach((photo) => {
-    if (!photo?.photoDataUrl) return
+  // Two photos per row for regular photos, single column for strips
+  const regular = photos.filter(p => !p?.isStrip && p?.photoDataUrl)
+  const strips  = photos.filter(p =>  p?.isStrip && p?.photoDataUrl)
 
+  // Pair regular photos into rows of 2
+  for (let i = 0; i < regular.length; i += 2) {
+    const pair = regular.slice(i, i + 2)
+    const cells = pair.map(photo => ({
+      stack: [
+        {
+          // Gold-bordered mat table
+          table: {
+            widths: ['*'],
+            body: [[
+              {
+                image: photo.photoDataUrl,
+                fit: [200, 150],
+                alignment: 'center',
+                margin: [4, 4, 4, 4],
+                border: [true, true, true, true]
+              }
+            ]]
+          },
+          layout: {
+            hLineColor: () => '#C9A84C',
+            vLineColor: () => '#C9A84C',
+            hLineWidth: () => 1.5,
+            vLineWidth: () => 1.5,
+            fillColor: () => '#FFFDF8'
+          }
+        },
+        {
+          text: photo.caption || 'Photo Booth Memory',
+          fontSize: 8,
+          color: '#9B8A7C',
+          alignment: 'center',
+          margin: [0, 4, 0, 0]
+        }
+      ],
+      margin: [0, 0, 0, 12]
+    }))
+    // Pad to 2 columns
+    while (cells.length < 2) cells.push({ text: '' })
+    content.push({ columns: cells, columnGap: 12 })
+  }
+
+  // Strips go full-width
+  strips.forEach(photo => {
     content.push({
       stack: [
         {
-          image: photo.photoDataUrl,
-          fit: photo.isStrip ? [180, 380] : [420, 250],
-          alignment: 'center',
-          margin: [0, 0, 0, 6]
+          table: {
+            widths: ['*'],
+            body: [[
+              {
+                image: photo.photoDataUrl,
+                fit: [180, 360],
+                alignment: 'center',
+                margin: [4, 4, 4, 4],
+                border: [true, true, true, true]
+              }
+            ]]
+          },
+          layout: {
+            hLineColor: () => '#C9A84C',
+            vLineColor: () => '#C9A84C',
+            hLineWidth: () => 1.5,
+            vLineWidth: () => 1.5,
+            fillColor: () => '#FFFDF8'
+          },
+          alignment: 'center'
         },
         {
-          text: photo.isStrip ? 'Photo Strip' : (photo.caption || 'Photo Booth Memory'),
-          fontSize: 9,
+          text: 'Photo Strip',
+          fontSize: 8,
           color: '#9B8A7C',
           alignment: 'center',
-          margin: [0, 0, 0, 14]
+          margin: [0, 4, 0, 12]
         }
-      ],
-      margin: [0, 0, 0, 8]
+      ]
     })
   })
 
@@ -411,7 +493,7 @@ export function generateGuestbookPDF({ messages = [], boothPhotos = [], boothVid
 
   const docDefinition = {
     pageSize: 'A4',
-    pageMargins: [40, 40, 40, 50],
+    pageMargins: [50, 55, 50, 55],
     content,
     footer: (currentPage, pageCount) => ({
       columns: [

@@ -70,7 +70,65 @@
   font-size: 1rem;
   margin-bottom: var(--space-md);
 }
+.export-checkbox {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-xs) 0;
+  cursor: pointer;
+}
 
+.export-checkbox input {
+  accent-color: var(--burgundy);
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.export-checkbox-icon {
+  font-size: 0.95rem;
+  flex-shrink: 0;
+}
+
+.export-checkbox-label {
+  font-size: 0.88rem;
+  color: var(--text-dark);
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.export-optin-badge {
+  font-size: 0.64rem;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: rgba(201, 168, 76, 0.15);
+  color: var(--gold-dark);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.export-checkbox-count {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--burgundy);
+  min-width: 20px;
+  text-align: right;
+}
+
+.export-pdf-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.export-page-estimate {
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--text-light);
+  font-style: italic;
+}
 .export-stat {
   display: flex;
   justify-content: space-between;
@@ -106,11 +164,6 @@
   accent-color: var(--burgundy);
   width: 16px;
   height: 16px;
-}
-
-.export-checkbox span {
-  font-size: 0.9rem;
-  color: var(--text-dark);
 }
 
 .export-btn {
@@ -151,6 +204,18 @@
   border-color: var(--gold);
 }
 
+.export-btn-print {
+  background: transparent;
+  color: var(--burgundy);
+  border: 1.5px solid var(--burgundy);
+  font-size: 0.95rem;
+}
+
+.export-btn-print:hover {
+  background: var(--burgundy);
+  color: var(--cream);
+}
+
 .export-btn-loading {
   display: flex;
   align-items: center;
@@ -188,5 +253,21 @@
 
   .export-sidebar {
     position: static;
+  }
+}
+
+@media print {
+  .export-header,
+  .export-sidebar,
+  .export-editors,
+  .export-layout > .export-main > .export-section:first-child > h3 {
+    display: none !important;
+  }
+  .export-page {
+    padding: 0;
+    max-width: none;
+  }
+  .export-layout {
+    display: block;
   }
 }

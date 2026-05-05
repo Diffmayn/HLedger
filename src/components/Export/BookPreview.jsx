@@ -1,292 +1,338 @@
-import { useEffect, useMemo, useState } from 'react'
+﻿import { useEffect, useMemo, useRef, useState } from 'react'
 import './BookPreview.css'
 
 function chunkItems(items, size) {
   const chunks = []
-  for (let i = 0; i < items.length; i += size) {
-    chunks.push(items.slice(i, i + size))
-  }
+  for (let i = 0; i < items.length; i += size) chunks.push(items.slice(i, i + size))
   return chunks
+}
+
+// ─── Page Components ───────────────────────────────────────────────────────────
+
+function PageCover() {
+  return (
+    <div className="bp-page bp-cover">
+      <div className="bp-cover-ornament">✦</div>
+      <div className="bp-cover-body">
+        <p className="bp-cover-celebrating">Celebrating</p>
+        <h1 className="bp-cover-name">Jeannette</h1>
+        <div className="bp-cover-rule" />
+        <p className="bp-cover-years">25 Wonderful Years</p>
+        <p className="bp-cover-company">at Salling Group</p>
+      </div>
+      <p className="bp-cover-date">
+        {new Date().toLocaleDateString('da-DK', { year: 'numeric', month: 'long' })}
+      </p>
+    </div>
+  )
+}
+
+function PageSpeech({ page }) {
+  return (
+    <div className="bp-page bp-interior">
+      <header className="bp-page-header">
+        <span className="bp-chip">Speech</span>
+        <h3>{page.title || 'A Few Words'}</h3>
+        <div className="bp-rule" />
+      </header>
+      <div className="bp-speech-body">
+        {page.body.split('\n').map((p, i) => <p key={i}>{p || '\u00a0'}</p>)}
+      </div>
+      {page.author && <p className="bp-speech-author">— {page.author}</p>}
+      <div className="bp-page-number">{page.pageNum}</div>
+    </div>
+  )
+}
+
+function PageMessages({ page }) {
+  return (
+    <div className="bp-page bp-interior">
+      <header className="bp-page-header">
+        <span className="bp-chip">Messages</span>
+        <h3>{page.title}</h3>
+        <div className="bp-rule" />
+      </header>
+      <div className="bp-messages-list">
+        {page.items.map((msg) => (
+          <div key={msg.id} className="bp-message-card">
+            {msg.photoDataUrl && (
+              <div className="bp-msg-photo">
+                <div className="bp-photo-mat"><img src={msg.photoDataUrl} alt="" /></div>
+              </div>
+            )}
+            <p className="bp-message-text">{msg.message}</p>
+            {msg.emojis && <span className="bp-message-emojis">{msg.emojis}</span>}
+            <p className="bp-message-name">— {msg.name || 'Anonymous'}</p>
+          </div>
+        ))}
+      </div>
+      {page.remaining > 0 && <p className="bp-continues">+{page.remaining} more on next pages</p>}
+      <div className="bp-page-number">{page.pageNum}</div>
+    </div>
+  )
+}
+
+function PagePhotos({ page }) {
+  const hasStrip = page.items.some(p => p.isStrip)
+  return (
+    <div className="bp-page bp-interior">
+      <header className="bp-page-header">
+        <span className="bp-chip">Gallery</span>
+        <h3>{page.title}</h3>
+        <div className="bp-rule" />
+      </header>
+      <div className={`bp-photo-grid ${hasStrip ? 'bp-photo-grid--single' : ''}`}>
+        {page.items.map((photo) => (
+          <div key={photo.id} className={`bp-photo-frame ${photo.isStrip ? 'bp-photo-frame--strip' : ''}`}>
+            <div className="bp-photo-mat">
+              <img src={photo.photoDataUrl} alt={photo.isStrip ? 'Photo strip' : 'Booth photo'} />
+            </div>
+            <p className="bp-photo-caption">{photo.isStrip ? '🎞 Photo Strip' : '📸 Booth'}</p>
+          </div>
+        ))}
+      </div>
+      {page.remaining > 0 && <p className="bp-continues">+{page.remaining} more photos on next pages</p>}
+      <div className="bp-page-number">{page.pageNum}</div>
+    </div>
+  )
+}
+
+function PageVideos({ page }) {
+  return (
+    <div className="bp-page bp-interior">
+      <header className="bp-page-header">
+        <span className="bp-chip">Videos</span>
+        <h3>{page.title}</h3>
+        <div className="bp-rule" />
+      </header>
+      <div className="bp-photo-grid">
+        {page.items.map((video) => (
+          <div key={video.id} className="bp-photo-frame bp-video-frame">
+            <div className="bp-photo-mat bp-video-mat">
+              {video.videoThumbnailDataUrl
+                ? <img src={video.videoThumbnailDataUrl} alt="Video" />
+                : <div className="bp-video-placeholder">🎥</div>}
+              <div className="bp-play-badge">▶</div>
+            </div>
+            <p className="bp-photo-caption">{video.source === 'booth' ? 'Booth clip' : 'Video message'}</p>
+          </div>
+        ))}
+      </div>
+      {page.remaining > 0 && <p className="bp-continues">+{page.remaining} more on next pages</p>}
+      <div className="bp-page-number">{page.pageNum}</div>
+    </div>
+  )
+}
+
+function PageNotes({ page }) {
+  return (
+    <div className="bp-page bp-interior">
+      <header className="bp-page-header">
+        <span className="bp-chip">Notes</span>
+        <h3>Personal Notes</h3>
+        <div className="bp-rule" />
+      </header>
+      <div className="bp-notes-lined">
+        {page.body.split('\n').map((line, i) => (
+          <p key={i} className="bp-notes-line">{line || '\u00a0'}</p>
+        ))}
+      </div>
+      <div className="bp-page-number">{page.pageNum}</div>
+    </div>
+  )
+}
+
+function PageBack() {
+  return (
+    <div className="bp-page bp-back">
+      <div className="bp-cover-ornament">✦</div>
+      <p className="bp-back-thanks">Thank you for being part of</p>
+      <p className="bp-back-name">Jeannette's Journey</p>
+      <div className="bp-cover-rule" />
+      <p className="bp-back-date">
+        {new Date().toLocaleDateString('da-DK', { year: 'numeric', month: 'long', day: 'numeric' })}
+      </p>
+    </div>
+  )
 }
 
 function renderPage(page) {
   switch (page.type) {
-    case 'cover':
-      return (
-        <div className="book-page book-cover">
-          <span className="book-page-chip">Cover</span>
-          <div className="book-cover-star">✦</div>
-          <h2>Celebrating</h2>
-          <h1>Jeannette</h1>
-          <div className="book-cover-divider" />
-          <p className="book-cover-years">25 Wonderful Years</p>
-          <p className="book-cover-company">at Salling Group</p>
-        </div>
-      )
-
-    case 'speech':
-      return (
-        <div className="book-page book-speech">
-          <span className="book-page-chip">Speech</span>
-          <h3>{page.title || 'A Few Words'}</h3>
-          <div className="book-speech-text">
-            {page.body.split('\n').map((paragraph, index) => (
-              <p key={index}>{paragraph}</p>
-            ))}
-          </div>
-          {page.author && <p className="book-speech-author">— {page.author}</p>}
-        </div>
-      )
-
-    case 'messages':
-      return (
-        <div className="book-page book-messages">
-          <span className="book-page-chip">Messages</span>
-          <h3>{page.title}</h3>
-          <div className="book-messages-grid">
-            {page.items.map((msg) => (
-              <div key={msg.id} className="book-message-item">
-                <p className="book-message-text">{msg.message}</p>
-                {msg.emojis && <span className="book-message-emojis">{msg.emojis}</span>}
-                <p className="book-message-name">— {msg.name || 'Anonymous'}</p>
-              </div>
-            ))}
-          </div>
-          {page.remaining > 0 && (
-            <p className="book-messages-more">{page.remaining} more messages continue on the next pages.</p>
-          )}
-        </div>
-      )
-
-    case 'photos':
-      return (
-        <div className="book-page book-photos">
-          <span className="book-page-chip">Gallery</span>
-          <h3>{page.title}</h3>
-          <div className={`book-photos-grid ${page.items.some((photo) => photo.isStrip) ? 'book-photos-grid--mixed' : ''}`}>
-            {page.items.map((photo) => (
-              <div key={photo.id} className={`book-photo-item${photo.isStrip ? ' book-photo-item--strip' : ''}`}>
-                <img src={photo.photoDataUrl} alt={photo.isStrip ? 'Photo strip memory' : 'Booth memory'} />
-                <span className="book-photo-kind">{photo.isStrip ? 'Photo strip' : 'Booth photo'}</span>
-              </div>
-            ))}
-          </div>
-          {page.remaining > 0 && (
-            <p className="book-messages-more">{page.remaining} more photos continue on the next pages.</p>
-          )}
-        </div>
-      )
-
-    case 'videos':
-      return (
-        <div className="book-page book-videos">
-          <span className="book-page-chip">Videos</span>
-          <h3>{page.title}</h3>
-          <div className="book-videos-grid">
-            {page.items.map((video) => (
-              <div key={video.id} className="book-video-item">
-                {video.videoThumbnailDataUrl ? (
-                  <img src={video.videoThumbnailDataUrl} alt={video.title || 'Saved video preview'} />
-                ) : (
-                  <div className="book-video-thumb-placeholder">No preview</div>
-                )}
-                <span className="book-photo-kind">{video.source === 'booth' ? 'Booth video' : 'Video message'}</span>
-              </div>
-            ))}
-          </div>
-          {page.remaining > 0 && (
-            <p className="book-messages-more">{page.remaining} more videos continue on the next pages.</p>
-          )}
-        </div>
-      )
-
-    case 'notes':
-      return (
-        <div className="book-page book-notes">
-          <span className="book-page-chip">Notes</span>
-          <h3>Personal Notes</h3>
-          <div className="book-notes-body">
-            {page.body.split('\n').map((paragraph, index) => (
-              <p key={index}>{paragraph || ' '}</p>
-            ))}
-          </div>
-        </div>
-      )
-
+    case 'cover':    return <PageCover />
+    case 'speech':   return <PageSpeech page={page} />
+    case 'messages': return <PageMessages page={page} />
+    case 'photos':   return <PagePhotos page={page} />
+    case 'videos':   return <PageVideos page={page} />
+    case 'notes':    return <PageNotes page={page} />
     case 'back':
-    default:
-      return (
-        <div className="book-page book-back">
-          <span className="book-page-chip">Back Cover</span>
-          <p>Thank you for being part of</p>
-          <p className="book-back-name">Jeannette's Journey</p>
-          <p className="book-back-date">{new Date().toLocaleDateString('da-DK', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
-        </div>
-      )
+    default:         return <PageBack />
   }
 }
 
+// ─── Main Component ────────────────────────────────────────────────────────────
+
 export default function BookPreview({ messages, boothPhotos, boothVideos, speech, sections, notes }) {
   const pages = useMemo(() => {
-    const nextPages = []
+    const out = []
+    let pageNum = 1
 
-    if (sections?.cover !== false) {
-      nextPages.push({ type: 'cover', label: 'Cover' })
-    }
+    if (sections?.cover !== false)
+      out.push({ type: 'cover', label: 'Cover', pageNum: pageNum++ })
 
-    if (sections?.speech !== false && speech?.body) {
-      nextPages.push({
-        type: 'speech',
-        label: 'Speech',
-        title: speech.title,
-        body: speech.body,
-        author: speech.author
-      })
-    }
+    if (sections?.speech !== false && speech?.body)
+      out.push({ type: 'speech', label: 'Speech', pageNum: pageNum++, title: speech.title, body: speech.body, author: speech.author })
 
     if (sections?.messages !== false && messages.length > 0) {
-      const chunks = chunkItems(messages, 4)
-      chunks.forEach((items, index) => {
-        nextPages.push({
-          type: 'messages',
-          label: `Messages ${index + 1}`,
-          title: index === 0 ? 'Messages from Colleagues' : 'More Kind Words',
-          items,
-          remaining: Math.max(messages.length - (index + 1) * 4, 0)
-        })
-      })
+      chunkItems(messages, 3).forEach((items, i) => out.push({
+        type: 'messages', label: `Messages ${i + 1}`, pageNum: pageNum++,
+        title: i === 0 ? 'Messages from Colleagues' : 'More Kind Words',
+        items, remaining: Math.max(messages.length - (i + 1) * 3, 0)
+      }))
     }
 
     if (sections?.photos !== false && boothPhotos.length > 0) {
-      const chunks = chunkItems(boothPhotos, 4)
-      chunks.forEach((items, index) => {
-        nextPages.push({
-          type: 'photos',
-          label: `Photos ${index + 1}`,
-          title: index === 0 ? 'Photo Booth Memories' : 'More Photo Booth Moments',
-          items,
-          remaining: Math.max(boothPhotos.length - (index + 1) * 4, 0)
-        })
-      })
+      chunkItems(boothPhotos, 4).forEach((items, i) => out.push({
+        type: 'photos', label: `Photos ${i + 1}`, pageNum: pageNum++,
+        title: i === 0 ? 'Photo Booth Memories' : 'More Booth Moments',
+        items, remaining: Math.max(boothPhotos.length - (i + 1) * 4, 0)
+      }))
     }
 
     if (sections?.videos !== false && boothVideos.length > 0) {
-      const chunks = chunkItems(boothVideos, 4)
-      chunks.forEach((items, index) => {
-        nextPages.push({
-          type: 'videos',
-          label: `Videos ${index + 1}`,
-          title: index === 0 ? 'Video Messages & Booth Clips' : 'More Saved Videos',
-          items,
-          remaining: Math.max(boothVideos.length - (index + 1) * 4, 0)
-        })
-      })
+      chunkItems(boothVideos, 4).forEach((items, i) => out.push({
+        type: 'videos', label: `Videos ${i + 1}`, pageNum: pageNum++,
+        title: i === 0 ? 'Video Memories' : 'More Videos',
+        items, remaining: Math.max(boothVideos.length - (i + 1) * 4, 0)
+      }))
     }
 
-    if (sections?.notes !== false && notes?.trim()) {
-      nextPages.push({ type: 'notes', label: 'Notes', body: notes.trim() })
-    }
+    if (sections?.notes !== false && notes?.trim())
+      out.push({ type: 'notes', label: 'Notes', pageNum: pageNum++, body: notes.trim() })
 
-    if (sections?.backCover !== false) {
-      nextPages.push({ type: 'back', label: 'Back Cover' })
-    }
+    if (sections?.backCover !== false)
+      out.push({ type: 'back', label: 'Back Cover', pageNum: pageNum++ })
 
-    return nextPages
+    return out
   }, [boothPhotos, boothVideos, messages, notes, sections, speech])
 
-  const [currentPage, setCurrentPage] = useState(0)
-  const [flipDirection, setFlipDirection] = useState('next')
+  const [current, setCurrent] = useState(0)
+  const [displayed, setDisplayed] = useState(0)
+  const [animState, setAnimState] = useState('')
+  const [spread, setSpread] = useState(false)
+  const busy = useRef(false)
 
-  const goToPage = (index) => {
-    if (index < 0 || index >= pages.length || index === currentPage) return
-    setFlipDirection(index > currentPage ? 'next' : 'prev')
-    setCurrentPage(index)
-  }
-
-  const handleStageClick = (event) => {
-    const rect = event.currentTarget.getBoundingClientRect()
-    const clickedLeftSide = event.clientX < rect.left + rect.width / 2
-    goToPage(clickedLeftSide ? currentPage - 1 : currentPage + 1)
+  const goToPage = (idx) => {
+    if (idx < 0 || idx >= pages.length || idx === current || busy.current) return
+    const dir = idx > current ? 'next' : 'prev'
+    busy.current = true
+    setAnimState(`out-${dir}`)
+    setTimeout(() => {
+      setDisplayed(idx)
+      setCurrent(idx)
+      setAnimState(`in-${dir}`)
+      setTimeout(() => {
+        setAnimState('')
+        busy.current = false
+      }, 380)
+    }, 220)
   }
 
   useEffect(() => {
-    if (currentPage > pages.length - 1) {
-      setCurrentPage(Math.max(0, pages.length - 1))
+    if (current >= pages.length) {
+      const safe = Math.max(0, pages.length - 1)
+      setCurrent(safe)
+      setDisplayed(safe)
     }
-  }, [currentPage, pages.length])
+  }, [pages.length])
 
   useEffect(() => {
-    const handleKeyDown = (event) => {
-      const tagName = event.target?.tagName
-      const isTypingField = tagName === 'INPUT' || tagName === 'TEXTAREA' || event.target?.isContentEditable
-
-      if (isTypingField) return
-      if (event.key === 'ArrowRight') goToPage(currentPage + 1)
-      if (event.key === 'ArrowLeft') goToPage(currentPage - 1)
+    const onKey = (e) => {
+      const tag = e.target?.tagName
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || e.target?.isContentEditable) return
+      if (e.key === 'ArrowRight') goToPage(current + 1)
+      if (e.key === 'ArrowLeft')  goToPage(current - 1)
     }
-
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [currentPage, pages.length])
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [current, pages.length])
 
   if (pages.length === 0) {
     return (
-      <div className="book-preview-shell">
-        <p className="book-preview-empty">No pages are available for preview yet.</p>
+      <div className="bp-shell">
+        <p className="bp-empty">Enable at least one section to preview the book.</p>
       </div>
     )
   }
 
-  const activePage = pages[currentPage]
+  const activePage = pages[displayed] ?? pages[0]
+  const spreadLeft = spread && current > 0 ? pages[current - 1] : null
 
   return (
-    <div className="book-preview-shell">
-      <div className="book-preview-toolbar">
-        <button
-          type="button"
-          className="book-preview-nav"
-          onClick={() => goToPage(currentPage - 1)}
-          disabled={currentPage === 0}
-          aria-label="Go to previous page"
-        >
-          ←
-        </button>
+    <div className="bp-shell">
 
-        <div className="book-preview-status">
-          <strong>Page {currentPage + 1} of {pages.length}</strong>
-          <span>{activePage.label}</span>
+      {/* Toolbar */}
+      <div className="bp-toolbar">
+        <button className="bp-nav" onClick={() => goToPage(current - 1)} disabled={current === 0} aria-label="Previous page">‹</button>
+        <div className="bp-toolbar-center">
+          <span className="bp-page-label">{activePage.label}</span>
+          <span className="bp-page-count">Page {current + 1} of {pages.length}</span>
         </div>
-
+        <button className="bp-nav" onClick={() => goToPage(current + 1)} disabled={current === pages.length - 1} aria-label="Next page">›</button>
         <button
-          type="button"
-          className="book-preview-nav"
-          onClick={() => goToPage(currentPage + 1)}
-          disabled={currentPage === pages.length - 1}
-          aria-label="Go to next page"
+          className={`bp-spread-btn ${spread ? 'bp-spread-btn--on' : ''}`}
+          onClick={() => setSpread(s => !s)}
+          title={spread ? 'Single page view' : 'Two-page spread'}
         >
-          →
+          {spread ? '▭' : '▯▯'}
         </button>
       </div>
 
-      <p className="book-preview-hint">Click the left or right side of the page to turn it like a book.</p>
-
-      <div className="book-stage" onClick={handleStageClick} role="presentation">
-        <div key={currentPage} className={`book-preview book-preview-flip-${flipDirection}`}>
-          {renderPage(activePage)}
+      {/* Book Stage */}
+      {spread ? (
+        <div className="bp-stage bp-stage--spread">
+          <div className="bp-spread-wrapper">
+            {spreadLeft
+              ? <div className="bp-page-wrapper bp-spread-left">{renderPage(spreadLeft)}</div>
+              : <div className="bp-spread-blank" />}
+            <div className="bp-spine" />
+            <div className="bp-page-wrapper bp-spread-right">{renderPage(activePage)}</div>
+          </div>
         </div>
-      </div>
+      ) : (
+        <div
+          className="bp-stage"
+          onClick={(e) => {
+            const r = e.currentTarget.getBoundingClientRect()
+            goToPage(e.clientX < r.left + r.width / 2 ? current - 1 : current + 1)
+          }}
+        >
+          <div className={`bp-edge bp-edge-left ${current === 0 ? 'bp-edge--dim' : ''}`} />
+          <div className={`bp-page-wrapper bp-anim-${animState}`}>
+            {renderPage(activePage)}
+          </div>
+          <div className={`bp-edge bp-edge-right ${current === pages.length - 1 ? 'bp-edge--dim' : ''}`} />
+        </div>
+      )}
 
-      <div className="book-preview-dots" aria-label="Book pages">
-        {pages.map((page, index) => (
+      <p className="bp-hint">
+        {spread
+          ? 'Two-page spread — click ▭ for single page'
+          : '‹ › or click edges to turn pages · ▯▯ for spread view'}
+      </p>
+
+      {/* Dot navigation */}
+      <div className="bp-dots">
+        {pages.map((p, i) => (
           <button
-            key={`${page.label}-${index}`}
-            type="button"
-            className={`book-preview-dot ${index === currentPage ? 'is-active' : ''}`}
-            onClick={() => goToPage(index)}
-            aria-label={`Go to ${page.label}`}
+            key={`${p.type}-${i}`}
+            className={`bp-dot ${i === current ? 'bp-dot--active' : ''}`}
+            onClick={() => goToPage(i)}
+            aria-label={`Page ${i + 1}: ${p.label}`}
+            title={p.label}
           />
         ))}
       </div>
+
     </div>
   )
 }

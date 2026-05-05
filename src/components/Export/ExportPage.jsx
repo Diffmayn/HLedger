@@ -45,7 +45,7 @@ export default function ExportPage() {
     speech: true,
     messages: true,
     photos: true,
-    videos: true,
+    videos: false,
     notes: true,
     backCover: true
   })
@@ -260,38 +260,53 @@ export default function ExportPage() {
           </div>
 
           <div className="export-options">
-            <h3>Include Sections</h3>
+            <h3>📖 Book Sections</h3>
             {[
-              { key: 'cover', label: 'Cover Page' },
-              { key: 'speech', label: "Boss's Speech" },
-              { key: 'messages', label: 'Guest Messages' },
-              { key: 'photos', label: 'Booth Photos' },
-              { key: 'videos', label: 'Saved Videos' },
-              { key: 'notes', label: 'Personal Notes Page' },
-              { key: 'backCover', label: 'Back Cover' }
-            ].map(({ key, label }) => (
+              { key: 'cover',     icon: '🎨', label: 'Cover Page',        count: null },
+              { key: 'speech',    icon: '🎤', label: "Boss's Speech",     count: speech?.body ? '✓' : null },
+              { key: 'messages',  icon: '💬', label: 'Guest Messages',    count: messages.length || null },
+              { key: 'photos',    icon: '📸', label: 'Booth Photos',      count: boothPhotos.length || null },
+              { key: 'videos',    icon: '🎥', label: 'Videos',            count: (messages.filter(m => m.videoBlob).length + boothVideos.length) || null, optin: true },
+              { key: 'notes',     icon: '📝', label: 'Personal Notes',    count: notes.trim() ? '✓' : null },
+              { key: 'backCover', icon: '🌟', label: 'Back Cover',        count: null }
+            ].map(({ key, icon, label, count, optin }) => (
               <label key={key} className="export-checkbox">
                 <input
                   type="checkbox"
                   checked={sections[key]}
                   onChange={() => toggleSection(key)}
                 />
-                <span>{label}</span>
+                <span className="export-checkbox-icon">{icon}</span>
+                <span className="export-checkbox-label">
+                  {label}
+                  {optin && <span className="export-optin-badge">opt-in</span>}
+                </span>
+                {count !== null && <span className="export-checkbox-count">{count}</span>}
               </label>
             ))}
           </div>
 
           <button
-            className="export-btn"
-            onClick={handleExport}
-            disabled={isGenerating || !hasSelectedSection}
+            className="export-btn export-btn-print"
+            onClick={() => window.print()}
           >
-            {isGenerating ? (
-              <span className="export-btn-loading">⏳ Generating PDF…</span>
-            ) : (
-              <span>📖 Download PDF Book</span>
-            )}
+            🖨️ Print Current Page
           </button>
+
+          <div className="export-pdf-wrap">
+            <button
+              className="export-btn"
+              onClick={handleExport}
+              disabled={isGenerating || !hasSelectedSection}
+            >
+              {isGenerating ? (
+                <span className="export-btn-loading">⏳ Generating PDF…</span>
+              ) : (
+                <span>📖 Download PDF Book</span>
+              )}
+            </button>
+            <p className="export-page-estimate">~{estimatedPages} {estimatedPages === 1 ? 'page' : 'pages'}</p>
+          </div>
 
           <button
             className="export-btn export-btn-zip"
