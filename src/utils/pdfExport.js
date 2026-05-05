@@ -1,10 +1,4 @@
-import pdfMake from 'pdfmake/build/pdfmake'
-import * as pdfFonts from 'pdfmake/build/vfs_fonts'
 import { formatVideoDuration } from './videoUtils'
-
-if (pdfMake.vfs === undefined) {
-  pdfMake.vfs = pdfFonts.pdfMake ? pdfFonts.pdfMake.vfs : pdfFonts.default?.pdfMake?.vfs || pdfFonts.vfs
-}
 
 function addSectionWithPageBreak(sectionBlocks, section) {
   if (!section.length) return
@@ -32,7 +26,7 @@ function buildCoverPage() {
       alignment: 'center',
       fontSize: 14,
       color: '#E8D48B',
-      letterSpacing: 3,
+      characterSpacing: 3,
       margin: [0, 0, 0, 6]
     },
     {
@@ -461,7 +455,16 @@ export function estimateGuestbookPages({ messages = [], boothPhotos = [], boothV
   return Math.max(total, 1)
 }
 
-export function generateGuestbookPDF({ messages = [], boothPhotos = [], boothVideos = [], speech, notes = '', includeSections = {} }) {
+export async function generateGuestbookPDF({ messages = [], boothPhotos = [], boothVideos = [], speech, notes = '', includeSections = {} }) {
+  const [{ default: pdfMake }, pdfFonts] = await Promise.all([
+    import('pdfmake/build/pdfmake'),
+    import('pdfmake/build/vfs_fonts')
+  ])
+
+  if (pdfMake.vfs === undefined) {
+    pdfMake.vfs = pdfFonts.pdfMake ? pdfFonts.pdfMake.vfs : pdfFonts.default?.pdfMake?.vfs || pdfFonts.vfs
+  }
+
   const sectionBlocks = []
 
   if (includeSections.cover !== false) {

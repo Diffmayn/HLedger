@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { Component, useMemo, useState } from 'react'
 import { useMessages, useBoothPhotos, useBoothVideos, useSettings, useSpeech } from '../../hooks/useDatabase'
 import { estimateGuestbookPages, generateGuestbookPDF } from '../../utils/pdfExport'
 import SpeechEditor from './SpeechEditor'
@@ -29,6 +29,64 @@ function escapeCsv(val) {
   return s
 }
 
+function sanitizeFilePart(value, fallback = 'entry') {
+  const cleaned = String(value || '')
+    .replace(/[<>:"/\\|?*\x00-\x1F]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '')
+    .slice(0, 40)
+  return cleaned || fallback
+}
+
+function extensionFromDataUrl(dataUrl) {
+  if (!dataUrl || typeof dataUrl !== 'string') return 'jpg'
+  if (dataUrl.includes('image/png')) return 'png'
+  if (dataUrl.includes('image/webp')) return 'webp'
+  if (dataUrl.includes('image/gif')) return 'gif'
+  return 'jpg'
+}
+
+async function writeFileToDirectory(directoryHandle, filename, content) {
+  const fileHandle = await directoryHandle.getFileHandle(filename, { create: true })
+  const writable = await fileHandle.createWritable()
+  await writable.write(content)
+  await writable.close()
+}
+
+class ExportPreviewErrorBoundary extends Component {
+  constructor(props) {
+    super(props)
+    this.state = { hasError: false }
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true }
+  }
+
+  componentDidCatch(error) {
+    console.error('Export preview failed to render:', error)
+  }
+
+  componentDidUpdate(prevProps) {
+    if (this.state.hasError && prevProps.resetKey !== this.props.resetKey) {
+      this.setState({ hasError: false })
+    }
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="export-preview-error">
+          <p>Preview temporarily unavailable.</p>
+          <p>You can still export PDF/ZIP/files from the right panel.</p>
+        </div>
+      )
+    }
+    return this.props.children
+  }
+}
+
 export default function ExportPage() {
   const { messages } = useMessages()
   const { photos: boothPhotos } = useBoothPhotos()
@@ -39,6 +97,7 @@ export default function ExportPage() {
 
   const [isGenerating, setIsGenerating] = useState(false)
   const [isZipping, setIsZipping] = useState(false)
+  const [isSavingFolder, setIsSavingFolder] = useState(false)
   const [statusMessage, setStatusMessage] = useState('')
   const [sections, setSections] = useState({
     cover: true,
@@ -64,6 +123,7 @@ export default function ExportPage() {
   }), [messages, boothPhotos, boothVideos, notes, sections, speech])
 
   const hasSelectedSection = Object.values(sections).some(Boolean)
+  const hasAnyContent = messages.length > 0 || boothPhotos.length > 0 || boothVideos.length > 0 || !!speech?.body || !!notes.trim()
 
   const handleExport = async () => {
     setStatusMessage('')
@@ -199,6 +259,86 @@ export default function ExportPage() {
     setStatusMessage('The CSV export is ready to download.')
   }
 
+  const handleSaveToFolder = async () => {
+    setStatusMessage('')
+    if (typeof window.showDirectoryPicker !== 'function') {
+      setStatusMessage('Direct folder save is not supported in this browser. Downloading ZIP instead.')
+      await handleZipExport()
+      return
+    }
+
+    setIsSavingFolder(true)
+    try {
+      const root = await window.showDirectoryPicker({ mode: 'readwrite' })
+      const messagesDir = await root.getDirectoryHandle('messages', { create: true })
+      const messagePhotosDir = await root.getDirectoryHandle('message-photos', { create: true })
+      const boothDir = await root.getDirectoryHandle('booth-photos', { create: true })
+
+      const messagesSorted = [...messages].sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0))
+
+      for (let i = 0; i < messagesSorted.length; i++) {
+        const message = messagesSorted[i]
+        const index = String(i + 1).padStart(2, '0')
+        const name = sanitizeFilePart(message.name || 'anonymous', 'anonymous')
+        const baseName = `${index}-${name}`
+        const messageText = [
+          `Name: ${message.name || 'Anonymous'}`,
+          `Date: ${new Date(message.timestamp || Date.now()).toISOString()}`,
+          message.emojis ? `Emojis: ${message.emojis}` : null,
+          '',
+          message.message || ''
+        ].filter(Boolean).join('\n')
+
+        await writeFileToDirectory(messagesDir, `${baseName}.txt`, messageText)
+
+        if (message.photoDataUrl) {
+          const ext = extensionFromDataUrl(message.photoDataUrl)
+          await writeFileToDirectory(messagePhotosDir, `${baseName}.${ext}`, dataUrlToBlob(message.photoDataUrl))
+        }
+      }
+
+      for (let i = 0; i < boothPhotos.length; i++) {
+        const photo = boothPhotos[i]
+        if (!photo?.photoDataUrl) continue
+        const index = String(i + 1).padStart(2, '0')
+        const ext = extensionFromDataUrl(photo.photoDataUrl)
+        const typeLabel = photo.isStrip ? 'strip' : 'photo'
+        await writeFileToDirectory(boothDir, `${index}-booth-${typeLabel}.${ext}`, dataUrlToBlob(photo.photoDataUrl))
+      }
+
+      if (speech?.body) {
+        await writeFileToDirectory(
+          root,
+          'speech.txt',
+          `${speech.title || 'Speech'}${speech.author ? `\nBy: ${speech.author}` : ''}\n\n${speech.body}`
+        )
+      }
+
+      if (notes.trim()) {
+        await writeFileToDirectory(root, 'notes.txt', notes.trim())
+      }
+
+      await writeFileToDirectory(root, 'export-summary.txt', [
+        `Messages: ${messages.length}`,
+        `Message photos: ${messages.filter(m => m.photoDataUrl).length}`,
+        `Booth photos: ${boothPhotos.length}`,
+        `Booth videos: ${boothVideos.length}`,
+        `Saved at: ${new Date().toISOString()}`
+      ].join('\n'))
+
+      setStatusMessage('Files were saved to the selected folder successfully.')
+    } catch (err) {
+      if (err?.name === 'AbortError') {
+        setStatusMessage('Folder save was canceled.')
+      } else {
+        console.error('Folder save failed:', err)
+        setStatusMessage('Could not save files to folder. Please try ZIP export instead.')
+      }
+    } finally {
+      setIsSavingFolder(false)
+    }
+  }
+
   return (
     <div className="export-page">
       <div className="export-header">
@@ -210,14 +350,16 @@ export default function ExportPage() {
         <div className="export-main">
           <div className="export-section">
             <h3>Book Preview</h3>
-            <BookPreview
-              messages={messages}
-              boothPhotos={boothPhotos}
-              boothVideos={boothVideos}
-              speech={speech}
-              sections={sections}
-              notes={notes}
-            />
+            <ExportPreviewErrorBoundary resetKey={`${estimatedPages}-${messages.length}-${boothPhotos.length}-${boothVideos.length}`}>
+              <BookPreview
+                messages={messages}
+                boothPhotos={boothPhotos}
+                boothVideos={boothVideos}
+                speech={speech}
+                sections={sections}
+                notes={notes}
+              />
+            </ExportPreviewErrorBoundary>
           </div>
 
           <div className="export-editors">
@@ -311,12 +453,24 @@ export default function ExportPage() {
           <button
             className="export-btn export-btn-zip"
             onClick={handleZipExport}
-            disabled={isZipping || (messages.length === 0 && boothPhotos.length === 0 && boothVideos.length === 0 && !speech?.body && !notes.trim())}
+            disabled={isZipping || !hasAnyContent}
           >
             {isZipping ? (
               <span className="export-btn-loading">⏳ Creating ZIP…</span>
             ) : (
               <span>📦 Download ZIP Archive</span>
+            )}
+          </button>
+
+          <button
+            className="export-btn export-btn-folder"
+            onClick={handleSaveToFolder}
+            disabled={isSavingFolder || !hasAnyContent}
+          >
+            {isSavingFolder ? (
+              <span className="export-btn-loading">⏳ Saving Files…</span>
+            ) : (
+              <span>💾 Save Files to Folder</span>
             )}
           </button>
 

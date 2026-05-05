@@ -152,18 +152,21 @@
   font-size: 0.95rem;
 }
 
-.export-checkbox {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-  padding: var(--space-xs) 0;
-  cursor: pointer;
+.export-preview-error {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(160deg, var(--paper), var(--warm-white));
+  color: var(--text-medium);
+  padding: var(--space-xl);
+  text-align: center;
 }
 
-.export-checkbox input {
-  accent-color: var(--burgundy);
-  width: 16px;
-  height: 16px;
+.export-preview-error p {
+  margin: 0;
+}
+
+.export-preview-error p + p {
+  margin-top: var(--space-sm);
 }
 
 .export-btn {
@@ -201,6 +204,16 @@
 }
 
 .export-btn-csv:hover:not(:disabled) {
+  border-color: var(--gold);
+}
+
+.export-btn-folder {
+  background: var(--paper);
+  color: var(--burgundy);
+  border: 1px solid var(--border-subtle);
+}
+
+.export-btn-folder:hover:not(:disabled) {
   border-color: var(--gold);
 }
 
