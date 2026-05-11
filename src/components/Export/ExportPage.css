@@ -197,6 +197,11 @@
   color: var(--text-dark);
 }
 
+.export-btn-highlight {
+  background: linear-gradient(135deg, #165c53, #2f7a5f);
+  color: #f8f4ea;
+}
+
 .export-btn-csv {
   background: var(--warm-white);
   color: var(--text-dark);
@@ -243,6 +248,13 @@
   border-radius: var(--radius-md);
   color: var(--success);
   font-size: 0.9rem;
+  text-align: center;
+}
+
+.export-highlights-hint {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--text-light);
   text-align: center;
 }
 

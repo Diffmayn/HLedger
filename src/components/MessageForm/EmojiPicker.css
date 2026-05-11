@@ -1,5 +1,31 @@
 .emoji-picker-wrapper {
   position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.emoji-quick-picks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+}
+
+.emoji-quick-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  border: 1px solid var(--border-subtle);
+  background: white;
+  font-size: 1.15rem;
+  cursor: pointer;
+  transition: transform var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.emoji-quick-btn:hover {
+  border-color: var(--gold);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
 }
 
 .emoji-toggle-btn {
@@ -20,10 +46,9 @@
 
 .emoji-picker-dropdown {
   position: absolute;
-  bottom: 100%;
+  top: calc(100% + var(--space-xs));
   left: 0;
   z-index: 100;
-  margin-bottom: var(--space-sm);
   animation: slideDown 0.2s ease;
   box-shadow: var(--shadow-xl);
   border-radius: var(--radius-lg);

@@ -45,6 +45,30 @@ function getAngle(a, b) {
   return Math.atan2(b.y - a.y, b.x - a.x)
 }
 
+function normalizeFilterOptions(filterOrType) {
+  if (!filterOrType) return { type: null }
+  if (typeof filterOrType === 'string') return { type: filterOrType }
+  return filterOrType
+}
+
+function applyFilterAdjustments(position, filterOrType) {
+  if (!position) return null
+
+  const filter = normalizeFilterOptions(filterOrType)
+  const scale = (filter.fitScale ?? 1) * (filter.userScale ?? 1)
+  const width = position.width * scale
+  const height = position.height * scale
+
+  return {
+    ...position,
+    x: position.x - (width - position.width) / 2 + position.width * (filter.offsetXRatio ?? 0),
+    y: position.y - (height - position.height) / 2 + position.height * (filter.offsetYRatio ?? 0),
+    width,
+    height,
+    angle: (position.angle || 0) + (((filter.rotationOffset ?? 0) * Math.PI) / 180),
+  }
+}
+
 function getLandmarksByBackend(faceLandmarks) {
   if (!faceLandmarks || faceLandmarks.length === 0) return null
 
@@ -198,19 +222,57 @@ export function getFaceMaskPosition(faceLandmarks, canvasWidth, canvasHeight) {
   return { x: cx - width / 2, y: cy - height / 2, width, height, angle, preserveAspectRatio: true }
 }
 
-export function getAccessoryPosition(faceLandmarks, canvasWidth, canvasHeight, type) {
-  switch (type) {
-    case 'hat': return getHatPosition(faceLandmarks, canvasWidth, canvasHeight)
-    case 'glasses': return getGlassesPosition(faceLandmarks, canvasWidth, canvasHeight)
-    case 'moustache': return getMoustachePosition(faceLandmarks, canvasWidth, canvasHeight)
-    case 'nose': return getNosePosition(faceLandmarks, canvasWidth, canvasHeight)
-    case 'mouth': return getMouthAccessoryPosition(faceLandmarks, canvasWidth, canvasHeight)
-    case 'face': return getFaceMaskPosition(faceLandmarks, canvasWidth, canvasHeight)
-    default: return null
-  }
+export function getBodyAccessoryPosition(faceLandmarks, canvasWidth, canvasHeight) {
+  const points = getLandmarksByBackend(faceLandmarks)
+  if (!points?.left || !points?.right || !points?.chin) return null
+
+  const { left, right, chin, mouthLeft, mouthRight } = points
+  const faceWidth = dist(left, right) * canvasWidth
+  const shoulderWidth = faceWidth * 0.95
+  const width = shoulderWidth
+  const height = shoulderWidth * 0.52
+  const angle = getAngle(left, right)
+  const mouthCenter = mouthLeft && mouthRight ? midpoint(mouthLeft, mouthRight) : midpoint(left, right)
+  const cx = mouthCenter.x * canvasWidth
+  const cy = chin.y * canvasHeight + height * 0.7
+
+  return { x: cx - width / 2, y: cy - height / 2, width, height, angle, preserveAspectRatio: true }
 }
 
-export function drawFilter(ctx, img, position) {
+export function getAccessoryPosition(faceLandmarks, canvasWidth, canvasHeight, filterOrType) {
+  const filter = normalizeFilterOptions(filterOrType)
+  let position = null
+
+  switch (filter.type) {
+    case 'hat':
+      position = getHatPosition(faceLandmarks, canvasWidth, canvasHeight)
+      break
+    case 'glasses':
+      position = getGlassesPosition(faceLandmarks, canvasWidth, canvasHeight)
+      break
+    case 'moustache':
+      position = getMoustachePosition(faceLandmarks, canvasWidth, canvasHeight)
+      break
+    case 'nose':
+      position = getNosePosition(faceLandmarks, canvasWidth, canvasHeight)
+      break
+    case 'mouth':
+      position = getMouthAccessoryPosition(faceLandmarks, canvasWidth, canvasHeight)
+      break
+    case 'face':
+      position = getFaceMaskPosition(faceLandmarks, canvasWidth, canvasHeight)
+      break
+    case 'body':
+      position = getBodyAccessoryPosition(faceLandmarks, canvasWidth, canvasHeight)
+      break
+    default:
+      return null
+  }
+
+  return applyFilterAdjustments(position, filter)
+}
+
+export function drawFilter(ctx, img, position, opacity = 1) {
   if (!position || !img) return
   const { x, y, width, height, angle, preserveAspectRatio = true } = position
   let drawWidth = width
@@ -223,6 +285,7 @@ export function drawFilter(ctx, img, position) {
   }
 
   ctx.save()
+  ctx.globalAlpha = opacity
   ctx.translate(x + width / 2, y + height / 2)
   ctx.rotate(angle)
   ctx.drawImage(img, -drawWidth / 2, -drawHeight / 2, drawWidth, drawHeight)

@@ -2,99 +2,16 @@ import { useCallback, useEffect, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import db from '../data/db'
 import { supabase, isSupabaseConfigured } from '../data/supabaseClient'
-import { blobToDataUrl, dataUrlToBlob } from '../utils/blobUtils'
-
-async function ensureStorageHeadroom(additionalBytes = 0) {
-  if (!additionalBytes || !navigator.storage?.estimate) return
-
-  const { usage = 0, quota = 0 } = await navigator.storage.estimate()
-  if (!quota) return
-
-  const remaining = quota - usage
-  const required = Math.max(additionalBytes * 1.2, 10 * 1024 * 1024)
-  if (remaining < required) {
-    throw new Error('This device is low on browser storage. Please remove some saved media and try again.')
-  }
-}
-
-function mapSupabaseRowToMessage(row) {
-  const timestamp = Number(row.timestamp)
-  let videoBlob = null
-  if (row.video_data_url) {
-    try {
-      videoBlob = dataUrlToBlob(row.video_data_url)
-    } catch (_) {
-      videoBlob = null
-    }
-  }
-
-  return {
-    id: row.id,
-    name: row.name || '',
-    message: row.message || '',
-    emojis: row.emojis || '',
-    photoDataUrl: row.photo_data_url || null,
-    videoBlob,
-    videoMimeType: row.video_mime_type || null,
-    videoDuration: row.video_duration || 0,
-    videoThumbnailDataUrl: row.video_thumbnail_data_url || null,
-    timestamp: Number.isFinite(timestamp) ? timestamp : Date.now()
-  }
-}
-
-function mapSupabaseRowToPhoto(row) {
-  const timestamp = Number(row.timestamp)
-  return {
-    id: row.id,
-    photoDataUrl: row.photo_data_url || null,
-    caption: row.caption || '',
-    filtersUsed: Array.isArray(row.filters_used) ? row.filters_used : [],
-    isStrip: !!row.is_strip,
-    timestamp: Number.isFinite(timestamp) ? timestamp : Date.now()
-  }
-}
-
-function mapSupabaseRowToVideo(row) {
-  const timestamp = Number(row.timestamp)
-  let videoBlob = null
-  if (row.video_data_url) {
-    try {
-      videoBlob = dataUrlToBlob(row.video_data_url)
-    } catch (_) {
-      videoBlob = null
-    }
-  }
-
-  return {
-    id: row.id,
-    videoBlob,
-    videoMimeType: row.video_mime_type || null,
-    videoDuration: row.video_duration || 0,
-    videoThumbnailDataUrl: row.video_thumbnail_data_url || null,
-    source: row.source || 'booth',
-    filtersUsed: Array.isArray(row.filters_used) ? row.filters_used : [],
-    timestamp: Number.isFinite(timestamp) ? timestamp : Date.now()
-  }
-}
-
-async function mapMessageToSupabasePayload(msg) {
-  let videoDataUrl = null
-  if (msg.videoBlob instanceof Blob) {
-    videoDataUrl = await blobToDataUrl(msg.videoBlob)
-  }
-
-  return {
-    name: String(msg.name || '').trim(),
-    message: String(msg.message || '').trim(),
-    emojis: msg.emojis || '',
-    photo_data_url: msg.photoDataUrl || null,
-    video_data_url: videoDataUrl,
-    video_mime_type: msg.videoMimeType || null,
-    video_duration: msg.videoDuration || 0,
-    video_thumbnail_data_url: msg.videoThumbnailDataUrl || null,
-    timestamp: Date.now()
-  }
-}
+import {
+  ensureStorageHeadroom,
+  mapBoothPhotoToSupabasePayload,
+  mapBoothVideoToSupabasePayload,
+  mapMessageToSupabasePayload,
+  mapSupabaseRowToMessage,
+  mapSupabaseRowToPhoto,
+  mapSupabaseRowToVideo
+} from '../data/guestbookPersistence'
+import { startSupabaseRealtimeQuery } from '../data/supabaseRealtime'
 
 export function useMessages() {
   const localMessages = useLiveQuery(() => db.messages.orderBy('timestamp').reverse().toArray(), [])
@@ -103,41 +20,16 @@ export function useMessages() {
   useEffect(() => {
     if (!isSupabaseConfigured || !supabase) return undefined
 
-    let cancelled = false
-
-    const loadMessages = async () => {
-      const { data, error } = await supabase
-        .from('messages')
-        .select('*')
-        .order('timestamp', { ascending: false })
-
-      if (error) {
+    return startSupabaseRealtimeQuery({
+      supabaseClient: supabase,
+      channelName: 'guestbook-messages',
+      table: 'messages',
+      runQuery: (query) => query.select('*').order('timestamp', { ascending: false }),
+      onData: (data) => setRemoteMessages((data || []).map(mapSupabaseRowToMessage)),
+      onError: (error) => {
         console.error('[useDatabase] Failed to load shared messages:', error)
-        return
       }
-
-      if (!cancelled) {
-        setRemoteMessages((data || []).map(mapSupabaseRowToMessage))
-      }
-    }
-
-    loadMessages()
-
-    const channel = supabase
-      .channel('guestbook-messages')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'messages' },
-        () => {
-          void loadMessages()
-        }
-      )
-      .subscribe()
-
-    return () => {
-      cancelled = true
-      supabase.removeChannel(channel)
-    }
+    })
   }, [])
 
   const messages = isSupabaseConfigured ? remoteMessages : (localMessages || [])
@@ -187,11 +79,7 @@ export function useMessages() {
 
   const deleteMessage = useCallback(async (id) => {
     if (isSupabaseConfigured && supabase) {
-      const { error } = await supabase.from('messages').delete().eq('id', id)
-      if (error) {
-        throw new Error('Unable to remove this shared message right now.')
-      }
-      await supabase.from('reactions').delete().eq('entry_type', 'message').eq('entry_id', String(id))
+      throw new Error('Shared guestbook entries cannot be deleted from the public app.')
     } else {
       await db.messages.delete(id)
       // Also clean up reactions
@@ -209,41 +97,16 @@ export function useBoothPhotos() {
   useEffect(() => {
     if (!isSupabaseConfigured || !supabase) return undefined
 
-    let cancelled = false
-
-    const loadPhotos = async () => {
-      const { data, error } = await supabase
-        .from('booth_photos')
-        .select('*')
-        .order('timestamp', { ascending: false })
-
-      if (error) {
+    return startSupabaseRealtimeQuery({
+      supabaseClient: supabase,
+      channelName: 'guestbook-booth-photos',
+      table: 'booth_photos',
+      runQuery: (query) => query.select('*').order('timestamp', { ascending: false }),
+      onData: (data) => setRemotePhotos((data || []).map(mapSupabaseRowToPhoto)),
+      onError: (error) => {
         console.error('[useDatabase] Failed to load shared booth photos:', error)
-        return
       }
-
-      if (!cancelled) {
-        setRemotePhotos((data || []).map(mapSupabaseRowToPhoto))
-      }
-    }
-
-    loadPhotos()
-
-    const channel = supabase
-      .channel('guestbook-booth-photos')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'booth_photos' },
-        () => {
-          void loadPhotos()
-        }
-      )
-      .subscribe()
-
-    return () => {
-      cancelled = true
-      supabase.removeChannel(channel)
-    }
+    })
   }, [])
 
   const photos = isSupabaseConfigured ? remotePhotos : (localPhotos || [])
@@ -251,13 +114,7 @@ export function useBoothPhotos() {
   const addBoothPhoto = useCallback(async (photo) => {
     try {
       if (isSupabaseConfigured && supabase) {
-        const payload = {
-          photo_data_url: photo.photoDataUrl || null,
-          caption: photo.caption || '',
-          filters_used: Array.isArray(photo.filtersUsed) ? photo.filtersUsed : [],
-          is_strip: !!photo.isStrip,
-          timestamp: Date.now()
-        }
+        const payload = mapBoothPhotoToSupabasePayload(photo)
 
         const { data, error } = await supabase
           .from('booth_photos')
@@ -288,11 +145,7 @@ export function useBoothPhotos() {
 
   const deleteBoothPhoto = useCallback(async (id) => {
     if (isSupabaseConfigured && supabase) {
-      const { error } = await supabase.from('booth_photos').delete().eq('id', id)
-      if (error) {
-        throw new Error('Unable to remove this shared booth photo right now.')
-      }
-      await supabase.from('reactions').delete().eq('entry_type', 'photo').eq('entry_id', String(id))
+      throw new Error('Shared guestbook entries cannot be deleted from the public app.')
     } else {
       await db.boothPhotos.delete(id)
       await db.reactions.where({ entryType: 'photo', entryId: id }).delete()
@@ -309,41 +162,16 @@ export function useBoothVideos() {
   useEffect(() => {
     if (!isSupabaseConfigured || !supabase) return undefined
 
-    let cancelled = false
-
-    const loadVideos = async () => {
-      const { data, error } = await supabase
-        .from('booth_videos')
-        .select('*')
-        .order('timestamp', { ascending: false })
-
-      if (error) {
+    return startSupabaseRealtimeQuery({
+      supabaseClient: supabase,
+      channelName: 'guestbook-booth-videos',
+      table: 'booth_videos',
+      runQuery: (query) => query.select('*').order('timestamp', { ascending: false }),
+      onData: (data) => setRemoteVideos((data || []).map(mapSupabaseRowToVideo)),
+      onError: (error) => {
         console.error('[useDatabase] Failed to load shared booth videos:', error)
-        return
       }
-
-      if (!cancelled) {
-        setRemoteVideos((data || []).map(mapSupabaseRowToVideo))
-      }
-    }
-
-    loadVideos()
-
-    const channel = supabase
-      .channel('guestbook-booth-videos')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'booth_videos' },
-        () => {
-          void loadVideos()
-        }
-      )
-      .subscribe()
-
-    return () => {
-      cancelled = true
-      supabase.removeChannel(channel)
-    }
+    })
   }, [])
 
   const videos = isSupabaseConfigured ? remoteVideos : (localVideos || [])
@@ -355,16 +183,7 @@ export function useBoothVideos() {
       }
 
       if (isSupabaseConfigured && supabase) {
-        const videoDataUrl = video.videoBlob instanceof Blob ? await blobToDataUrl(video.videoBlob) : null
-        const payload = {
-          video_data_url: videoDataUrl,
-          video_mime_type: video.videoMimeType || null,
-          video_duration: video.videoDuration || 0,
-          video_thumbnail_data_url: video.videoThumbnailDataUrl || null,
-          source: video.source || 'booth',
-          filters_used: Array.isArray(video.filtersUsed) ? video.filtersUsed : [],
-          timestamp: Date.now()
-        }
+        const payload = await mapBoothVideoToSupabasePayload(video)
 
         const { data, error } = await supabase
           .from('booth_videos')
@@ -391,11 +210,7 @@ export function useBoothVideos() {
 
   const deleteBoothVideo = useCallback(async (id) => {
     if (isSupabaseConfigured && supabase) {
-      const { error } = await supabase.from('booth_videos').delete().eq('id', id)
-      if (error) {
-        throw new Error('Unable to remove this shared booth video right now.')
-      }
-      await supabase.from('reactions').delete().eq('entry_type', 'video').eq('entry_id', String(id))
+      throw new Error('Shared guestbook entries cannot be deleted from the public app.')
     } else {
       await db.boothVideos.delete(id)
       await db.reactions.where({ entryType: 'video', entryId: id }).delete()
@@ -412,40 +227,16 @@ export function useReactions() {
   useEffect(() => {
     if (!isSupabaseConfigured || !supabase) return undefined
 
-    let cancelled = false
-
-    const loadReactions = async () => {
-      const { data, error } = await supabase
-        .from('reactions')
-        .select('*')
-
-      if (error) {
+    return startSupabaseRealtimeQuery({
+      supabaseClient: supabase,
+      channelName: 'guestbook-reactions',
+      table: 'reactions',
+      runQuery: (query) => query.select('*'),
+      onData: (data) => setRemoteReactions(data || []),
+      onError: (error) => {
         console.error('[useDatabase] Failed to load shared reactions:', error)
-        return
       }
-
-      if (!cancelled) {
-        setRemoteReactions(data || [])
-      }
-    }
-
-    loadReactions()
-
-    const channel = supabase
-      .channel('guestbook-reactions')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'reactions' },
-        () => {
-          void loadReactions()
-        }
-      )
-      .subscribe()
-
-    return () => {
-      cancelled = true
-      supabase.removeChannel(channel)
-    }
+    })
   }, [])
 
   const reactions = isSupabaseConfigured
@@ -494,47 +285,23 @@ export function useSpeech() {
   useEffect(() => {
     if (!isSupabaseConfigured || !supabase) return undefined
 
-    let cancelled = false
-
-    const loadSpeech = async () => {
-      const { data, error } = await supabase
-        .from('speech')
-        .select('*')
-        .eq('id', 'shared')
-        .maybeSingle()
-
-      if (error) {
-        console.error('[useDatabase] Failed to load shared speech:', error)
-        return
-      }
-
-      if (!cancelled) {
+    return startSupabaseRealtimeQuery({
+      supabaseClient: supabase,
+      channelName: 'guestbook-speech',
+      table: 'speech',
+      runQuery: (query) => query.select('*').eq('id', 'shared').maybeSingle(),
+      onData: (data) => {
         setRemoteSpeech(data ? {
           id: data.id,
           title: data.title || '',
           body: data.body || '',
           author: data.author || ''
         } : null)
+      },
+      onError: (error) => {
+        console.error('[useDatabase] Failed to load shared speech:', error)
       }
-    }
-
-    loadSpeech()
-
-    const channel = supabase
-      .channel('guestbook-speech')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'speech' },
-        () => {
-          void loadSpeech()
-        }
-      )
-      .subscribe()
-
-    return () => {
-      cancelled = true
-      supabase.removeChannel(channel)
-    }
+    })
   }, [])
 
   const saveSpeech = useCallback(async (speech) => {
@@ -573,40 +340,16 @@ export function useSettings() {
   useEffect(() => {
     if (!isSupabaseConfigured || !supabase) return undefined
 
-    let cancelled = false
-
-    const loadSettings = async () => {
-      const { data, error } = await supabase
-        .from('settings')
-        .select('*')
-
-      if (error) {
+    return startSupabaseRealtimeQuery({
+      supabaseClient: supabase,
+      channelName: 'guestbook-settings',
+      table: 'settings',
+      runQuery: (query) => query.select('*'),
+      onData: (data) => setRemoteSettings((data || []).map((row) => ({ key: row.key, value: row.value_json }))),
+      onError: (error) => {
         console.error('[useDatabase] Failed to load shared settings:', error)
-        return
       }
-
-      if (!cancelled) {
-        setRemoteSettings((data || []).map((row) => ({ key: row.key, value: row.value_json })))
-      }
-    }
-
-    loadSettings()
-
-    const channel = supabase
-      .channel('guestbook-settings')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'settings' },
-        () => {
-          void loadSettings()
-        }
-      )
-      .subscribe()
-
-    return () => {
-      cancelled = true
-      supabase.removeChannel(channel)
-    }
+    })
   }, [])
 
   const settings = isSupabaseConfigured ? remoteSettings : (localSettings || [])

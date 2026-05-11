@@ -2,6 +2,8 @@ import { useRef, useEffect, useState } from 'react'
 import 'emoji-picker-element'
 import './EmojiPicker.css'
 
+const QUICK_EMOJIS = ['🎉', '❤️', '👏', '🥂', '✨', '📸', '🥳', '🌟']
+
 export default function EmojiPicker({ onSelect }) {
   const wrapperRef = useRef(null)
   const pickerRef = useRef(null)
@@ -39,12 +41,25 @@ export default function EmojiPicker({ onSelect }) {
 
   return (
     <div className="emoji-picker-wrapper" ref={wrapperRef}>
+      <div className="emoji-quick-picks" aria-label="Quick emoji picks">
+        {QUICK_EMOJIS.map((emoji) => (
+          <button
+            key={emoji}
+            type="button"
+            className="emoji-quick-btn"
+            onClick={() => onSelect(emoji)}
+            aria-label={`Add ${emoji}`}
+          >
+            {emoji}
+          </button>
+        ))}
+      </div>
       <button
         type="button"
         className="emoji-toggle-btn"
         onClick={() => setIsOpen(!isOpen)}
       >
-        😊 {isOpen ? 'Close' : 'Add Emoji'}
+        😊 {isOpen ? 'Close Picker' : 'More Emojis'}
       </button>
       {isOpen && (
         <div className="emoji-picker-dropdown">

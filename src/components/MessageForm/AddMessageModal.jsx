@@ -3,6 +3,7 @@ import confetti from 'canvas-confetti'
 import EmojiPicker from './EmojiPicker'
 import WebcamCapture from './WebcamCapture'
 import { resizeImage } from '../../utils/imageUtils'
+import { appendEmoji, removeEmojiAt, splitEmojiTokens } from '../../utils/emojiUtils'
 import { createVideoMetadata, formatVideoDuration } from '../../utils/videoUtils'
 import VideoCapture from '../Media/VideoCapture'
 import './AddMessageModal.css'
@@ -18,6 +19,7 @@ export default function AddMessageModal({ onSubmit, onClose }) {
   const [videoPreviewUrl, setVideoPreviewUrl] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState('')
+  const emojiTokens = splitEmojiTokens(emojis)
 
   useEffect(() => {
     if (!videoAttachment?.videoBlob) {
@@ -81,7 +83,11 @@ export default function AddMessageModal({ onSubmit, onClose }) {
   }
 
   const handleEmojiSelect = useCallback((emoji) => {
-    setEmojis(prev => prev + emoji)
+    setEmojis(prev => appendEmoji(prev, emoji))
+  }, [])
+
+  const handleEmojiRemove = useCallback((indexToRemove) => {
+    setEmojis(prev => removeEmojiAt(prev, indexToRemove))
   }, [])
 
   const handleSubmit = async (e) => {
@@ -180,9 +186,25 @@ export default function AddMessageModal({ onSubmit, onClose }) {
                 <label>Emojis</label>
                 <div className="emoji-row">
                   <div className="emoji-display">
-                    {emojis || <span className="emoji-placeholder">Pick some emojis ↓</span>}
+                    {emojiTokens.length > 0 ? (
+                      emojiTokens.map((emoji, index) => (
+                        <button
+                          key={`${emoji}-${index}`}
+                          type="button"
+                          className="emoji-pill"
+                          onClick={() => handleEmojiRemove(index)}
+                          aria-label={`Remove ${emoji}`}
+                          title="Remove emoji"
+                        >
+                          <span className="emoji-pill-symbol">{emoji}</span>
+                          <span className="emoji-pill-remove">✕</span>
+                        </button>
+                      ))
+                    ) : (
+                      <span className="emoji-placeholder">Tap a quick emoji or open the picker below.</span>
+                    )}
                   </div>
-                  {emojis && (
+                  {emojiTokens.length > 0 && (
                     <button type="button" className="emoji-clear" onClick={() => setEmojis('')}>✕</button>
                   )}
                 </div>
@@ -207,7 +229,7 @@ export default function AddMessageModal({ onSubmit, onClose }) {
                 </div>
               ) : videoAttachment ? (
                 <div className="photo-preview">
-                  <video src={videoPreviewUrl} controls playsInline className="media-preview-video" />
+                  {videoPreviewUrl && <video src={videoPreviewUrl} controls playsInline className="media-preview-video" />}
                   <div className="media-preview-meta">
                     <span>Video message</span>
                     <span>{formatVideoDuration(videoAttachment.videoDuration)}</span>

@@ -1,0 +1,107 @@
+.filter-adjustments {
+  width: min(100%, 720px);
+  background: linear-gradient(180deg, rgba(255, 250, 244, 0.96), rgba(246, 238, 226, 0.92));
+  border: 1px solid rgba(114, 47, 55, 0.12);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.filter-adjustments-header {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-md);
+  align-items: flex-start;
+}
+
+.filter-adjustments-header h4 {
+  margin: 4px 0 0;
+  font-family: var(--font-heading);
+  color: var(--burgundy);
+  font-size: 1rem;
+}
+
+.filter-adjustments-eyebrow {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gold-dark);
+}
+
+.filter-adjustments-reset {
+  border: 1px solid rgba(114, 47, 55, 0.16);
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--burgundy);
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-size: 0.78rem;
+}
+
+.filter-adjustments-pills {
+  display: flex;
+  gap: var(--space-xs);
+  overflow-x: auto;
+  padding: var(--space-sm) 0;
+}
+
+.filter-adjustments-pill {
+  border: 1px solid rgba(114, 47, 55, 0.14);
+  background: rgba(255, 255, 255, 0.84);
+  color: var(--text-medium);
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+
+.filter-adjustments-pill.active {
+  background: var(--burgundy);
+  color: var(--cream);
+  border-color: var(--burgundy);
+}
+
+.filter-adjustments-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-md);
+}
+
+.filter-adjustments-control {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-xs) var(--space-sm);
+  align-items: center;
+  background: rgba(255, 255, 255, 0.74);
+  border-radius: var(--radius-md);
+  padding: var(--space-sm);
+}
+
+.filter-adjustments-label {
+  color: var(--text-dark);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.filter-adjustments-value {
+  color: var(--burgundy);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.filter-adjustments-control input {
+  grid-column: 1 / -1;
+  width: 100%;
+  accent-color: var(--burgundy);
+}
+
+@media (max-width: 640px) {
+  .filter-adjustments-header {
+    flex-direction: column;
+  }
+
+  .filter-adjustments-grid {
+    grid-template-columns: 1fr;
+  }
+}

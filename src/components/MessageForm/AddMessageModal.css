@@ -134,12 +134,35 @@
   display: flex;
   align-items: center;
   flex-wrap: wrap;
+  gap: var(--space-xs);
 }
 
 .emoji-placeholder {
   font-size: 0.85rem;
   color: var(--text-light);
   letter-spacing: normal;
+}
+
+.emoji-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(201, 168, 76, 0.35);
+  background: rgba(201, 168, 76, 0.14);
+  color: var(--text-dark);
+  cursor: pointer;
+}
+
+.emoji-pill-symbol {
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+.emoji-pill-remove {
+  font-size: 0.7rem;
+  color: var(--burgundy);
 }
 
 .emoji-clear {

@@ -5,11 +5,21 @@ import useFaceTracking from '../../hooks/useFaceTracking'
 import useBroadcastChannel from '../../hooks/useBroadcastChannel'
 import { useBoothPhotos, useBoothVideos } from '../../hooks/useDatabase'
 import FilterOverlay from '../FaceFilter/FilterOverlay'
+import FilterAdjustments from '../FaceFilter/FilterAdjustments'
 import FilterSelector from '../FaceFilter/FilterSelector'
 import PhotoStrip from './PhotoStrip'
 import VideoCapture from '../Media/VideoCapture'
 import { composePhotoStrip } from '../../utils/imageUtils'
 import './PhotoBooth.css'
+
+function createActiveFilter(filter) {
+  return {
+    ...filter,
+    defaultOpacity: filter.opacity ?? 1,
+    opacity: filter.opacity ?? 1,
+    userScale: 1,
+  }
+}
 
 export default function PhotoBooth() {
   const navigate = useNavigate()
@@ -21,6 +31,7 @@ export default function PhotoBooth() {
   const overlayRef = useRef(null)
 
   const [activeFilters, setActiveFilters] = useState([])
+  const [selectedFilterId, setSelectedFilterId] = useState(null)
   const [capturedFrames, setCapturedFrames] = useState([])
   const [countdown, setCountdown] = useState(null)
   const [flashActive, setFlashActive] = useState(false)
@@ -53,11 +64,28 @@ export default function PhotoBooth() {
 
   const toggleFilter = useCallback((filter) => {
     if (filter === null) { setActiveFilters([]); return }
+
+    const exists = activeFilters.find((activeFilter) => activeFilter.id === filter.id)
+    if (exists) {
+      setActiveFilters((prev) => prev.filter((activeFilter) => activeFilter.id !== filter.id))
+      if (selectedFilterId === filter.id) {
+        const remaining = activeFilters.filter((activeFilter) => activeFilter.id !== filter.id)
+        setSelectedFilterId(remaining[remaining.length - 1]?.id ?? null)
+      }
+      return
+    }
+
     setActiveFilters(prev => {
-      const exists = prev.find(f => f.id === filter.id)
-      if (exists) return prev.filter(f => f.id !== filter.id)
-      return [...prev.filter(f => f.type !== filter.type), filter]
+      const nextFilter = createActiveFilter(filter)
+      return [...prev.filter(activeFilter => activeFilter.type !== filter.type), nextFilter]
     })
+    setSelectedFilterId(filter.id)
+  }, [activeFilters, selectedFilterId])
+
+  const updateActiveFilter = useCallback((filterId, patch) => {
+    setActiveFilters((prev) => prev.map((filter) => (
+      filter.id === filterId ? { ...filter, ...patch } : filter
+    )))
   }, [])
 
   const captureWithFlash = useCallback(() => {
@@ -247,7 +275,19 @@ export default function PhotoBooth() {
             )}
           </div>
 
-          <FilterSelector activeFilters={activeFilters} onToggle={toggleFilter} />
+          <FilterSelector
+            activeFilters={activeFilters}
+            onToggle={toggleFilter}
+            selectedFilterId={selectedFilterId}
+            onSelectActiveFilter={setSelectedFilterId}
+          />
+
+          <FilterAdjustments
+            activeFilters={activeFilters}
+            selectedFilterId={selectedFilterId}
+            onSelectFilter={setSelectedFilterId}
+            onUpdateFilter={updateActiveFilter}
+          />
 
           <div className="booth-controls">
             <button className="booth-btn booth-btn-strip" onClick={startCountdown} disabled={countdown !== null || !isReady}>

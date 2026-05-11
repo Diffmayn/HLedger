@@ -2,13 +2,24 @@ import { useState, useRef, useCallback, useEffect } from 'react'
 import useWebcam from '../../hooks/useWebcam'
 import useFaceTracking from '../../hooks/useFaceTracking'
 import FilterOverlay from '../FaceFilter/FilterOverlay'
+import FilterAdjustments from '../FaceFilter/FilterAdjustments'
 import FilterSelector from '../FaceFilter/FilterSelector'
 import './WebcamCapture.css'
+
+function createActiveFilter(filter) {
+  return {
+    ...filter,
+    defaultOpacity: filter.opacity ?? 1,
+    opacity: filter.opacity ?? 1,
+    userScale: 1,
+  }
+}
 
 export default function WebcamCapture({ onCapture, onClose }) {
   const { videoRef, isReady, error, startCamera, stopCamera, captureFrame } = useWebcam()
   const { landmarks, isTracking, isLoading, trackingError, faceCount, start: startTracking, stop: stopTracking } = useFaceTracking(videoRef)
   const [activeFilters, setActiveFilters] = useState([])
+  const [selectedFilterId, setSelectedFilterId] = useState(null)
   const [capturedPhoto, setCapturedPhoto] = useState(null)
   const [videoDimensions, setVideoDimensions] = useState({ width: 1280, height: 720 })
   const overlayRef = useRef(null)
@@ -37,14 +48,30 @@ export default function WebcamCapture({ onCapture, onClose }) {
   const toggleFilter = useCallback((filter) => {
     if (filter === null) {
       setActiveFilters([])
+      setSelectedFilterId(null)
       return
     }
+
+    const exists = activeFilters.find((activeFilter) => activeFilter.id === filter.id)
+    if (exists) {
+      setActiveFilters((prev) => prev.filter((activeFilter) => activeFilter.id !== filter.id))
+      if (selectedFilterId === filter.id) {
+        const remaining = activeFilters.filter((activeFilter) => activeFilter.id !== filter.id)
+        setSelectedFilterId(remaining[remaining.length - 1]?.id ?? null)
+      }
+      return
+    }
+
     setActiveFilters(prev => {
-      const exists = prev.find(f => f.id === filter.id)
-      if (exists) return prev.filter(f => f.id !== filter.id)
-      // Only one per type
-      return [...prev.filter(f => f.type !== filter.type), filter]
+      return [...prev.filter(activeFilter => activeFilter.type !== filter.type), createActiveFilter(filter)]
     })
+    setSelectedFilterId(filter.id)
+  }, [activeFilters, selectedFilterId])
+
+  const updateActiveFilter = useCallback((filterId, patch) => {
+    setActiveFilters((prev) => prev.map((filter) => (
+      filter.id === filterId ? { ...filter, ...patch } : filter
+    )))
   }, [])
 
   const handleCapture = () => {
@@ -131,7 +158,19 @@ export default function WebcamCapture({ onCapture, onClose }) {
             )}
           </div>
 
-          <FilterSelector activeFilters={activeFilters} onToggle={toggleFilter} />
+          <FilterSelector
+            activeFilters={activeFilters}
+            onToggle={toggleFilter}
+            selectedFilterId={selectedFilterId}
+            onSelectActiveFilter={setSelectedFilterId}
+          />
+
+          <FilterAdjustments
+            activeFilters={activeFilters}
+            selectedFilterId={selectedFilterId}
+            onSelectFilter={setSelectedFilterId}
+            onUpdateFilter={updateActiveFilter}
+          />
 
           <div className="webcam-actions">
             <button type="button" onClick={handleCapture} className="webcam-btn webcam-btn-capture" disabled={!isReady}>

@@ -1,19 +1,9 @@
 import { createClient } from '@supabase/supabase-js'
+import { getSupabaseConfig } from './supabaseConfig'
 
-function normalizeEnvValue(value, envName) {
-  if (typeof value !== 'string') return ''
+const { supabaseUrl, supabaseAnonKey, isSupabaseConfigured } = getSupabaseConfig()
 
-  const trimmed = value.trim().replace(/^['"]|['"]$/g, '')
-  const prefixedPattern = new RegExp(`^${envName}\\s*=\\s*`, 'i')
-  const normalized = trimmed.replace(prefixedPattern, '').trim()
-
-  return normalized
-}
-
-const supabaseUrl = normalizeEnvValue(import.meta.env.VITE_SUPABASE_URL, 'VITE_SUPABASE_URL')
-const supabaseAnonKey = normalizeEnvValue(import.meta.env.VITE_SUPABASE_ANON_KEY, 'VITE_SUPABASE_ANON_KEY')
-
-export const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey)
+export { isSupabaseConfigured }
 
 export const supabase = isSupabaseConfigured
   ? createClient(supabaseUrl, supabaseAnonKey, {

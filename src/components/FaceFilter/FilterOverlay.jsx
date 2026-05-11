@@ -1,7 +1,7 @@
 import { useRef, useEffect, useImperativeHandle, forwardRef } from 'react'
 import { getAccessoryPosition, drawFilter } from '../../utils/filterPositioning'
 import { loadImage } from '../../utils/imageUtils'
-import { applyFilterWarp, supportsWarping, drawFilterStatic } from '../../utils/filterWarper'
+import { applyFilterWarp, supportsWarping } from '../../utils/filterWarper'
 
 const FilterOverlay = forwardRef(function FilterOverlay(
   { videoRef, landmarks, activeFilters, width, height },
@@ -86,9 +86,9 @@ const FilterOverlay = forwardRef(function FilterOverlay(
                     face,
                     canvas.width,
                     canvas.height,
-                    filter.type
+                    filter
                   )
-                  if (pos) drawFilter(ctx, img, pos)
+                  if (pos) drawFilter(ctx, img, pos, filter.opacity || 1)
                 }
               } else {
                 // Use traditional static positioning for non-morphable filters
@@ -96,9 +96,9 @@ const FilterOverlay = forwardRef(function FilterOverlay(
                   face,
                   canvas.width,
                   canvas.height,
-                  filter.type
+                  filter
                 )
-                if (pos) drawFilter(ctx, img, pos)
+                if (pos) drawFilter(ctx, img, pos, filter.opacity || 1)
               }
             }
           }

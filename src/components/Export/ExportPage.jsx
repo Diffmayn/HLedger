@@ -1,6 +1,7 @@
 import { Component, useMemo, useState } from 'react'
-import { useMessages, useBoothPhotos, useBoothVideos, useSettings, useSpeech } from '../../hooks/useDatabase'
+import { useMessages, useBoothPhotos, useBoothVideos, useReactions, useSettings, useSpeech } from '../../hooks/useDatabase'
 import { estimateGuestbookPages, generateGuestbookPDF } from '../../utils/pdfExport'
+import { buildReactionLeaderboard } from '../../utils/reactionUtils'
 import SpeechEditor from './SpeechEditor'
 import NotesEditor from './NotesEditor'
 import BookPreview from './BookPreview'
@@ -54,6 +55,16 @@ async function writeFileToDirectory(directoryHandle, filename, content) {
   await writable.close()
 }
 
+function buildMessageExportText(message) {
+  return [
+    `Name: ${message.name || 'Anonymous'}`,
+    `Date: ${new Date(message.timestamp || Date.now()).toISOString()}`,
+    message.emojis ? `Emojis: ${message.emojis}` : null,
+    '',
+    message.message || ''
+  ].filter(Boolean).join('\n')
+}
+
 class ExportPreviewErrorBoundary extends Component {
   constructor(props) {
     super(props)
@@ -91,12 +102,14 @@ export default function ExportPage() {
   const { messages } = useMessages()
   const { photos: boothPhotos } = useBoothPhotos()
   const { videos: boothVideos } = useBoothVideos()
+  const { reactions } = useReactions()
   const { speech, saveSpeech } = useSpeech()
   const { getSetting, setSetting } = useSettings()
   const notes = getSetting('ebookNotes') || ''
 
   const [isGenerating, setIsGenerating] = useState(false)
   const [isZipping, setIsZipping] = useState(false)
+  const [isGeneratingHighlights, setIsGeneratingHighlights] = useState(false)
   const [isSavingFolder, setIsSavingFolder] = useState(false)
   const [statusMessage, setStatusMessage] = useState('')
   const [sections, setSections] = useState({
@@ -124,6 +137,15 @@ export default function ExportPage() {
 
   const hasSelectedSection = Object.values(sections).some(Boolean)
   const hasAnyContent = messages.length > 0 || boothPhotos.length > 0 || boothVideos.length > 0 || !!speech?.body || !!notes.trim()
+  const messageVideos = useMemo(() => messages.filter((message) => message.videoBlob), [messages])
+  const boothStrips = useMemo(() => boothPhotos.filter((photo) => photo.isStrip), [boothPhotos])
+  const reactionHighlights = useMemo(() => buildReactionLeaderboard({
+    messages,
+    boothPhotos,
+    boothVideos,
+    reactions,
+  }, 10), [boothPhotos, boothVideos, messages, reactions])
+  const hasHighlightBundle = boothStrips.length > 0 || boothVideos.length > 0 || reactionHighlights.length > 0
 
   const handleExport = async () => {
     setStatusMessage('')
@@ -236,6 +258,105 @@ export default function ExportPage() {
     }
   }
 
+  const handleHighlightsExport = async () => {
+    setStatusMessage('')
+    setIsGeneratingHighlights(true)
+
+    try {
+      const [{ default: JSZip }, { saveAs }] = await Promise.all([
+        import('jszip'),
+        import('file-saver')
+      ])
+
+      const zip = new JSZip()
+      const highlightsFolder = zip.folder('highlights')
+      const stripsFolder = highlightsFolder?.folder('booth-strips')
+      const videosFolder = highlightsFolder?.folder('booth-videos')
+      const topReactedFolder = highlightsFolder?.folder('top-reacted')
+
+      boothStrips.forEach((photo, index) => {
+        if (!photo.photoDataUrl) return
+        const extension = extensionFromDataUrl(photo.photoDataUrl)
+        stripsFolder?.file(`strip-${String(index + 1).padStart(2, '0')}.${extension}`, dataUrlToBlob(photo.photoDataUrl))
+      })
+
+      boothVideos.forEach((video, index) => {
+        if (!video.videoBlob) return
+        const extension = video.videoMimeType?.includes('mp4') ? 'mp4' : 'webm'
+        videosFolder?.file(`booth-video-${String(index + 1).padStart(2, '0')}.${extension}`, video.videoBlob)
+        if (video.videoThumbnailDataUrl) {
+          const extension = extensionFromDataUrl(video.videoThumbnailDataUrl)
+          videosFolder?.file(`booth-video-${String(index + 1).padStart(2, '0')}-thumb.${extension}`, dataUrlToBlob(video.videoThumbnailDataUrl))
+        }
+      })
+
+      reactionHighlights.forEach((item, index) => {
+        const baseName = `${String(index + 1).padStart(2, '0')}-${item.type}-${sanitizeFilePart(item.entry.name || item.entry.title || item.entry.id, item.type)}`
+        topReactedFolder?.file(`${baseName}.json`, JSON.stringify({
+          id: item.entry.id,
+          type: item.type,
+          reactions: item.total,
+          breakdown: item.breakdown,
+          timestamp: item.entry.timestamp,
+          hasPhoto: !!item.entry.photoDataUrl,
+          hasVideo: !!item.entry.videoBlob,
+        }, null, 2))
+
+        if (item.type === 'message') {
+          topReactedFolder?.file(`${baseName}.txt`, buildMessageExportText(item.entry))
+          if (item.entry.photoDataUrl) {
+            const extension = extensionFromDataUrl(item.entry.photoDataUrl)
+            topReactedFolder?.file(`${baseName}.${extension}`, dataUrlToBlob(item.entry.photoDataUrl))
+          }
+          if (item.entry.videoBlob) {
+            const extension = item.entry.videoMimeType?.includes('mp4') ? 'mp4' : 'webm'
+            topReactedFolder?.file(`${baseName}.${extension}`, item.entry.videoBlob)
+          }
+          if (item.entry.videoThumbnailDataUrl) {
+            const extension = extensionFromDataUrl(item.entry.videoThumbnailDataUrl)
+            topReactedFolder?.file(`${baseName}-thumb.${extension}`, dataUrlToBlob(item.entry.videoThumbnailDataUrl))
+          }
+        }
+
+        if (item.type === 'photo' && item.entry.photoDataUrl) {
+          const extension = extensionFromDataUrl(item.entry.photoDataUrl)
+          topReactedFolder?.file(`${baseName}.${extension}`, dataUrlToBlob(item.entry.photoDataUrl))
+        }
+
+        if (item.type === 'video' && item.entry.videoBlob) {
+          const extension = item.entry.videoMimeType?.includes('mp4') ? 'mp4' : 'webm'
+          topReactedFolder?.file(`${baseName}.${extension}`, item.entry.videoBlob)
+          if (item.entry.videoThumbnailDataUrl) {
+            const extension = extensionFromDataUrl(item.entry.videoThumbnailDataUrl)
+            topReactedFolder?.file(`${baseName}-thumb.${extension}`, dataUrlToBlob(item.entry.videoThumbnailDataUrl))
+          }
+        }
+      })
+
+      highlightsFolder?.file('summary.json', JSON.stringify({
+        boothStrips: boothStrips.length,
+        boothVideos: boothVideos.length,
+        messageVideos: messageVideos.length,
+        topReactedEntries: reactionHighlights.map((item) => ({
+          id: item.entry.id,
+          type: item.type,
+          reactions: item.total,
+          breakdown: item.breakdown,
+        })),
+        generatedAt: new Date().toISOString(),
+      }, null, 2))
+
+      const content = await zip.generateAsync({ type: 'blob' })
+      saveAs(content, 'jeannettes-guestbook-highlights.zip')
+      setStatusMessage('The highlights bundle is ready to download.')
+    } catch (err) {
+      console.error('Highlights export failed:', err)
+      setStatusMessage('The highlights bundle could not be created. Please try again.')
+    } finally {
+      setIsGeneratingHighlights(false)
+    }
+  }
+
   const handleCsvExport = () => {
     const header = ['Name', 'Message', 'Emojis', 'Has Photo', 'Has Video', 'Video Duration', 'Date']
     const rows = messages.map(m => [
@@ -281,13 +402,7 @@ export default function ExportPage() {
         const index = String(i + 1).padStart(2, '0')
         const name = sanitizeFilePart(message.name || 'anonymous', 'anonymous')
         const baseName = `${index}-${name}`
-        const messageText = [
-          `Name: ${message.name || 'Anonymous'}`,
-          `Date: ${new Date(message.timestamp || Date.now()).toISOString()}`,
-          message.emojis ? `Emojis: ${message.emojis}` : null,
-          '',
-          message.message || ''
-        ].filter(Boolean).join('\n')
+        const messageText = buildMessageExportText(message)
 
         await writeFileToDirectory(messagesDir, `${baseName}.txt`, messageText)
 
@@ -385,7 +500,15 @@ export default function ExportPage() {
             </div>
             <div className="export-stat">
               <span className="export-stat-label">Videos</span>
-              <span className="export-stat-value">{messages.filter(message => message.videoBlob).length + boothVideos.length}</span>
+              <span className="export-stat-value">{messageVideos.length + boothVideos.length}</span>
+            </div>
+            <div className="export-stat">
+              <span className="export-stat-label">Booth strips</span>
+              <span className="export-stat-value">{boothStrips.length}</span>
+            </div>
+            <div className="export-stat">
+              <span className="export-stat-label">Top reacted</span>
+              <span className="export-stat-value">{reactionHighlights.length || '—'}</span>
             </div>
             <div className="export-stat">
               <span className="export-stat-label">Speech</span>
@@ -408,7 +531,7 @@ export default function ExportPage() {
               { key: 'speech',    icon: '🎤', label: "Boss's Speech",     count: speech?.body ? '✓' : null },
               { key: 'messages',  icon: '💬', label: 'Guest Messages',    count: messages.length || null },
               { key: 'photos',    icon: '📸', label: 'Booth Photos',      count: boothPhotos.length || null },
-              { key: 'videos',    icon: '🎥', label: 'Videos',            count: (messages.filter(m => m.videoBlob).length + boothVideos.length) || null, optin: true },
+              { key: 'videos',    icon: '🎥', label: 'Videos',            count: (messageVideos.length + boothVideos.length) || null, optin: true },
               { key: 'notes',     icon: '📝', label: 'Personal Notes',    count: notes.trim() ? '✓' : null },
               { key: 'backCover', icon: '🌟', label: 'Back Cover',        count: null }
             ].map(({ key, icon, label, count, optin }) => (
@@ -449,6 +572,24 @@ export default function ExportPage() {
             </button>
             <p className="export-page-estimate">~{estimatedPages} {estimatedPages === 1 ? 'page' : 'pages'}</p>
           </div>
+
+          <button
+            className="export-btn export-btn-highlight"
+            onClick={handleHighlightsExport}
+            disabled={isGeneratingHighlights || !hasHighlightBundle}
+          >
+            {isGeneratingHighlights ? (
+              <span className="export-btn-loading">⏳ Packing highlights…</span>
+            ) : (
+              <span>✨ Download Highlights Bundle</span>
+            )}
+          </button>
+
+          {hasHighlightBundle && (
+            <p className="export-highlights-hint">
+              Includes {boothStrips.length} strips, {boothVideos.length} booth videos, and {reactionHighlights.length} top-reacted entries.
+            </p>
+          )}
 
           <button
             className="export-btn export-btn-zip"

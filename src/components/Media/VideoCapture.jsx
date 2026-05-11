@@ -82,7 +82,7 @@ export default function VideoCapture({ onCapture, onClose, title = 'Record a vid
 
       {capturedVideo ? (
         <div className="video-capture-result">
-          <video src={capturedUrl} controls playsInline className="video-capture-player" />
+          {capturedUrl && <video src={capturedUrl} controls playsInline className="video-capture-player" />}
           <div className="video-capture-meta">
             <span>Duration: {formatVideoDuration(capturedVideo.videoDuration)}</span>
             <span>Type: {capturedVideo.videoMimeType || 'video/webm'}</span>
