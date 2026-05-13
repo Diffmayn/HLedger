@@ -16,6 +16,7 @@ import { startSupabaseRealtimeQuery } from '../data/supabaseRealtime'
 export function useMessages() {
   const localMessages = useLiveQuery(() => db.messages.orderBy('timestamp').reverse().toArray(), [])
   const [remoteMessages, setRemoteMessages] = useState([])
+  const [remoteLoaded, setRemoteLoaded] = useState(false)
 
   useEffect(() => {
     if (!isSupabaseConfigured || !supabase) return undefined
@@ -25,26 +26,22 @@ export function useMessages() {
       channelName: 'guestbook-messages',
       table: 'messages',
       runQuery: (query) => query.select('*').order('timestamp', { ascending: false }),
-      onData: (data) => setRemoteMessages((data || []).map(mapSupabaseRowToMessage)),
+      onData: (data) => {
+        setRemoteMessages((data || []).map(mapSupabaseRowToMessage))
+        setRemoteLoaded(true)
+      },
       onError: (error) => {
         console.error('[useDatabase] Failed to load shared messages:', error)
+        setRemoteLoaded(true)
       }
     })
   }, [])
 
   const messages = isSupabaseConfigured ? remoteMessages : (localMessages || [])
-
-  useEffect(() => {
-    if (messages && messages.length > 0) {
-      const withPhotos = messages.filter(m => m.photoDataUrl).length
-      console.log(`[useMessages] Retrieved ${messages.length} messages, ${withPhotos} have photos`)
-    }
-  }, [messages])
+  const loaded = isSupabaseConfigured ? remoteLoaded : localMessages !== undefined
 
   const addMessage = useCallback(async (msg) => {
     try {
-      const hasPhoto = msg.photoDataUrl ? msg.photoDataUrl.length : 0
-      console.log(`[useDatabase] Adding message from "${msg.name}" with photo: ${hasPhoto > 0 ? `${hasPhoto} bytes` : 'none'}`)
       if (!isSupabaseConfigured && msg.videoBlob instanceof Blob) {
         await ensureStorageHeadroom(msg.videoBlob.size)
       }
@@ -66,7 +63,6 @@ export function useMessages() {
       }
 
       const id = await db.messages.add({ ...msg, timestamp: Date.now() })
-      console.log(`[useDatabase] Message added with ID: ${id}`)
       return id
     } catch (error) {
       console.error('[useDatabase] Failed to add message:', error)
@@ -87,12 +83,13 @@ export function useMessages() {
     }
   }, [])
 
-  return { messages: messages || [], addMessage, deleteMessage }
+  return { messages: messages || [], loaded, addMessage, deleteMessage }
 }
 
 export function useBoothPhotos() {
   const localPhotos = useLiveQuery(() => db.boothPhotos.orderBy('timestamp').reverse().toArray(), [])
   const [remotePhotos, setRemotePhotos] = useState([])
+  const [remoteLoaded, setRemoteLoaded] = useState(false)
 
   useEffect(() => {
     if (!isSupabaseConfigured || !supabase) return undefined
@@ -102,14 +99,19 @@ export function useBoothPhotos() {
       channelName: 'guestbook-booth-photos',
       table: 'booth_photos',
       runQuery: (query) => query.select('*').order('timestamp', { ascending: false }),
-      onData: (data) => setRemotePhotos((data || []).map(mapSupabaseRowToPhoto)),
+      onData: (data) => {
+        setRemotePhotos((data || []).map(mapSupabaseRowToPhoto))
+        setRemoteLoaded(true)
+      },
       onError: (error) => {
         console.error('[useDatabase] Failed to load shared booth photos:', error)
+        setRemoteLoaded(true)
       }
     })
   }, [])
 
   const photos = isSupabaseConfigured ? remotePhotos : (localPhotos || [])
+  const loaded = isSupabaseConfigured ? remoteLoaded : localPhotos !== undefined
 
   const addBoothPhoto = useCallback(async (photo) => {
     try {
@@ -152,12 +154,13 @@ export function useBoothPhotos() {
     }
   }, [])
 
-  return { photos: photos || [], addBoothPhoto, deleteBoothPhoto }
+  return { photos: photos || [], loaded, addBoothPhoto, deleteBoothPhoto }
 }
 
 export function useBoothVideos() {
   const localVideos = useLiveQuery(() => db.boothVideos.orderBy('timestamp').reverse().toArray(), [])
   const [remoteVideos, setRemoteVideos] = useState([])
+  const [remoteLoaded, setRemoteLoaded] = useState(false)
 
   useEffect(() => {
     if (!isSupabaseConfigured || !supabase) return undefined
@@ -167,14 +170,19 @@ export function useBoothVideos() {
       channelName: 'guestbook-booth-videos',
       table: 'booth_videos',
       runQuery: (query) => query.select('*').order('timestamp', { ascending: false }),
-      onData: (data) => setRemoteVideos((data || []).map(mapSupabaseRowToVideo)),
+      onData: (data) => {
+        setRemoteVideos((data || []).map(mapSupabaseRowToVideo))
+        setRemoteLoaded(true)
+      },
       onError: (error) => {
         console.error('[useDatabase] Failed to load shared booth videos:', error)
+        setRemoteLoaded(true)
       }
     })
   }, [])
 
   const videos = isSupabaseConfigured ? remoteVideos : (localVideos || [])
+  const loaded = isSupabaseConfigured ? remoteLoaded : localVideos !== undefined
 
   const addBoothVideo = useCallback(async (video) => {
     try {
@@ -217,7 +225,7 @@ export function useBoothVideos() {
     }
   }, [])
 
-  return { videos: videos || [], addBoothVideo, deleteBoothVideo }
+  return { videos: videos || [], loaded, addBoothVideo, deleteBoothVideo }
 }
 
 export function useReactions() {

@@ -1,42 +1,24 @@
-import { useState, useRef, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import useWebcam from '../../hooks/useWebcam'
-import useFaceTracking from '../../hooks/useFaceTracking'
 import useBroadcastChannel from '../../hooks/useBroadcastChannel'
 import { useBoothPhotos, useBoothVideos } from '../../hooks/useDatabase'
-import FilterOverlay from '../FaceFilter/FilterOverlay'
-import FilterAdjustments from '../FaceFilter/FilterAdjustments'
-import FilterSelector from '../FaceFilter/FilterSelector'
 import PhotoStrip from './PhotoStrip'
 import VideoCapture from '../Media/VideoCapture'
 import { composePhotoStrip } from '../../utils/imageUtils'
 import './PhotoBooth.css'
 
-function createActiveFilter(filter) {
-  return {
-    ...filter,
-    defaultOpacity: filter.opacity ?? 1,
-    opacity: filter.opacity ?? 1,
-    userScale: 1,
-  }
-}
-
 export default function PhotoBooth() {
   const navigate = useNavigate()
   const { videoRef, isReady, error, startCamera, stopCamera, captureFrame } = useWebcam()
-  const { landmarks, isTracking, isLoading, trackingError, faceCount, start: startTracking, stop: stopTracking } = useFaceTracking(videoRef)
   const { addBoothPhoto } = useBoothPhotos()
   const { addBoothVideo } = useBoothVideos()
   const { broadcast } = useBroadcastChannel()
-  const overlayRef = useRef(null)
 
-  const [activeFilters, setActiveFilters] = useState([])
-  const [selectedFilterId, setSelectedFilterId] = useState(null)
   const [capturedFrames, setCapturedFrames] = useState([])
   const [countdown, setCountdown] = useState(null)
   const [flashActive, setFlashActive] = useState(false)
   const [showStrip, setShowStrip] = useState(false)
-  const [videoDimensions, setVideoDimensions] = useState({ width: 1280, height: 720 })
   const [saveError, setSaveError] = useState('')
   const [isSavingStrip, setIsSavingStrip] = useState(false)
   const [showVideoCapture, setShowVideoCapture] = useState(false)
@@ -45,52 +27,11 @@ export default function PhotoBooth() {
     startCamera()
     return () => {
       stopCamera()
-      stopTracking()
     }
-  }, [])
-
-  useEffect(() => {
-    if (isReady) {
-      startTracking()
-      const video = videoRef.current
-      if (video) {
-        const updateDims = () => setVideoDimensions({ width: video.videoWidth, height: video.videoHeight })
-        video.addEventListener('loadedmetadata', updateDims)
-        if (video.videoWidth) updateDims()
-        return () => video.removeEventListener('loadedmetadata', updateDims)
-      }
-    }
-  }, [isReady])
-
-  const toggleFilter = useCallback((filter) => {
-    if (filter === null) { setActiveFilters([]); return }
-
-    const exists = activeFilters.find((activeFilter) => activeFilter.id === filter.id)
-    if (exists) {
-      setActiveFilters((prev) => prev.filter((activeFilter) => activeFilter.id !== filter.id))
-      if (selectedFilterId === filter.id) {
-        const remaining = activeFilters.filter((activeFilter) => activeFilter.id !== filter.id)
-        setSelectedFilterId(remaining[remaining.length - 1]?.id ?? null)
-      }
-      return
-    }
-
-    setActiveFilters(prev => {
-      const nextFilter = createActiveFilter(filter)
-      return [...prev.filter(activeFilter => activeFilter.type !== filter.type), nextFilter]
-    })
-    setSelectedFilterId(filter.id)
-  }, [activeFilters, selectedFilterId])
-
-  const updateActiveFilter = useCallback((filterId, patch) => {
-    setActiveFilters((prev) => prev.map((filter) => (
-      filter.id === filterId ? { ...filter, ...patch } : filter
-    )))
   }, [])
 
   const captureWithFlash = useCallback(() => {
-    const overlayCanvas = overlayRef.current?.getCanvas()
-    const dataUrl = captureFrame(overlayCanvas)
+    const dataUrl = captureFrame()
     if (dataUrl) {
       setFlashActive(true)
       setTimeout(() => setFlashActive(false), 200)
@@ -113,7 +54,6 @@ export default function PhotoBooth() {
         setCountdown(null)
         clearInterval(interval)
 
-        // Take photos in sequence
         const frames = []
         const takePhoto = (index) => {
           if (index >= totalPhotos) {
@@ -161,7 +101,6 @@ export default function PhotoBooth() {
     setSaveError('')
     setIsSavingStrip(true)
     try {
-      // Compose all frames into a single photo-strip image when there are multiple shots
       const photoDataUrl =
         capturedFrames.length > 1
           ? await composePhotoStrip(capturedFrames)
@@ -170,7 +109,6 @@ export default function PhotoBooth() {
       const id = await addBoothPhoto({
         photoDataUrl,
         caption: '',
-        filtersUsed: activeFilters.map(f => f.id),
         isStrip: capturedFrames.length > 1,
       })
       broadcast('NEW_BOOTH_PHOTO', { id, photoDataUrl, timestamp: Date.now() })
@@ -195,7 +133,6 @@ export default function PhotoBooth() {
     setSaveError('')
     setShowStrip(false)
     setCapturedFrames([])
-    stopTracking()
     stopCamera()
     setShowVideoCapture(true)
   }
@@ -211,7 +148,6 @@ export default function PhotoBooth() {
       const id = await addBoothVideo({
         ...capturedVideo,
         source: 'booth',
-        filtersUsed: activeFilters.map(filter => filter.id),
       })
       broadcast('NEW_BOOTH_VIDEO', { id, timestamp: Date.now() })
       await closeVideoCapture()
@@ -237,7 +173,7 @@ export default function PhotoBooth() {
     <div className="booth-page">
       <div className="booth-header">
         <h2>📸 Photo Booth</h2>
-        <p>Strike a pose, add face accessories, and capture memories.</p>
+        <p>Strike a pose and capture memories.</p>
       </div>
 
       <div className="booth-layout">
@@ -248,46 +184,13 @@ export default function PhotoBooth() {
               autoPlay playsInline muted
               className="booth-video"
             />
-            <FilterOverlay
-              ref={overlayRef}
-              videoRef={videoRef}
-              landmarks={landmarks}
-              activeFilters={activeFilters}
-              width={videoDimensions.width}
-              height={videoDimensions.height}
-            />
             {countdown !== null && (
               <div className="booth-countdown">
                 <span>{countdown}</span>
               </div>
             )}
             {flashActive && <div className="booth-flash" />}
-            {isLoading && (
-              <div className="booth-loading">Loading face tracking...</div>
-            )}
-            {trackingError && !isLoading && (
-              <div className="booth-tracking-warning">Face accessories are unavailable right now. Try adjusting your position or lighting.</div>
-            )}
-            {isTracking && faceCount > 0 && (
-              <div className="booth-face-count">
-                {faceCount} {faceCount === 1 ? 'face' : 'faces'}
-              </div>
-            )}
           </div>
-
-          <FilterSelector
-            activeFilters={activeFilters}
-            onToggle={toggleFilter}
-            selectedFilterId={selectedFilterId}
-            onSelectActiveFilter={setSelectedFilterId}
-          />
-
-          <FilterAdjustments
-            activeFilters={activeFilters}
-            selectedFilterId={selectedFilterId}
-            onSelectFilter={setSelectedFilterId}
-            onUpdateFilter={updateActiveFilter}
-          />
 
           <div className="booth-controls">
             <button className="booth-btn booth-btn-strip" onClick={startCountdown} disabled={countdown !== null || !isReady}>

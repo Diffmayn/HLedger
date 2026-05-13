@@ -52,27 +52,16 @@ export default function useWebcam() {
     setIsReady(false)
   }, [])
 
-  const captureFrame = useCallback((overlayCanvas, cssFilter) => {
+  const captureFrame = useCallback(() => {
     const video = videoRef.current
     if (!video) return null
     const canvas = document.createElement('canvas')
     canvas.width = video.videoWidth
     canvas.height = video.videoHeight
     const ctx = canvas.getContext('2d')
-    // Apply CSS filter if provided
-    if (cssFilter && cssFilter !== 'none') {
-      ctx.filter = cssFilter
-    }
-    // Mirror the video
     ctx.translate(canvas.width, 0)
     ctx.scale(-1, 1)
     ctx.drawImage(video, 0, 0)
-    ctx.setTransform(1, 0, 0, 1, 0, 0)
-    ctx.filter = 'none'
-    // Draw filter overlay on top (face accessories)
-    if (overlayCanvas) {
-      ctx.drawImage(overlayCanvas, 0, 0, canvas.width, canvas.height)
-    }
     return canvas.toDataURL('image/jpeg', 0.85)
   }, [])
 

@@ -1,6 +1,7 @@
+import { memo } from 'react'
 import './BoothPhotoCard.css'
 
-export default function BoothPhotoCard({ photo, index = 0, onClick, onDelete, large = false }) {
+function BoothPhotoCard({ photo, index = 0, onClick, onDelete, large = false }) {
   const timeStr = new Date(photo.timestamp).toLocaleTimeString('da-DK', {
     hour: '2-digit',
     minute: '2-digit'
@@ -16,13 +17,18 @@ export default function BoothPhotoCard({ photo, index = 0, onClick, onDelete, la
     }
   }
 
+  const handleClick = isInteractive ? () => onClick(photo) : undefined
+  const handleKeyDown = isInteractive
+    ? (e) => { if (e.key === 'Enter') onClick(photo) }
+    : undefined
+
   return (
     <div
       className={`booth-card${isStrip ? ' booth-card--strip' : ''}${large ? ' booth-card--large' : ''}${isInteractive ? '' : ' booth-card--static'}`}
-      onClick={onClick}
+      onClick={handleClick}
       role={isInteractive ? 'button' : undefined}
       tabIndex={isInteractive ? 0 : undefined}
-      onKeyDown={(e) => e.key === 'Enter' && onClick?.()}
+      onKeyDown={handleKeyDown}
       aria-label={isInteractive ? 'View booth photo' : undefined}
     >
       <div className="booth-card-badge">📸</div>
@@ -49,3 +55,5 @@ export default function BoothPhotoCard({ photo, index = 0, onClick, onDelete, la
     </div>
   )
 }
+
+export default memo(BoothPhotoCard)

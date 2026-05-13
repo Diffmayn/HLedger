@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react'
+import { memo, useState, useEffect } from 'react'
 import { formatVideoDuration } from '../../utils/videoUtils'
 import './VideoEntryCard.css'
 
-export default function VideoEntryCard({ video, index = 0, onClick, large = false, autoPlay = false }) {
+function VideoEntryCard({ video, index = 0, onClick, large = false, autoPlay = false }) {
   const [videoUrl, setVideoUrl] = useState('')
   
   useEffect(() => {
@@ -21,14 +21,18 @@ export default function VideoEntryCard({ video, index = 0, onClick, large = fals
     minute: '2-digit'
   })
   const isInteractive = typeof onClick === 'function'
+  const handleClick = isInteractive ? () => onClick(video) : undefined
+  const handleKeyDown = isInteractive
+    ? (e) => { if (e.key === 'Enter') onClick(video) }
+    : undefined
 
   return (
     <div
       className={`video-entry-card${large ? ' video-entry-card--large' : ''}${isInteractive ? '' : ' video-entry-card--static'}`}
-      onClick={onClick}
+      onClick={handleClick}
       role={isInteractive ? 'button' : undefined}
       tabIndex={isInteractive ? 0 : undefined}
-      onKeyDown={(e) => e.key === 'Enter' && onClick?.()}
+      onKeyDown={handleKeyDown}
       aria-label={isInteractive ? 'View saved video' : undefined}
     >
       <div className="video-entry-badge">🎥</div>
@@ -69,3 +73,5 @@ export default function VideoEntryCard({ video, index = 0, onClick, large = fals
     </div>
   )
 }
+
+export default memo(VideoEntryCard)

@@ -1,3 +1,5 @@
+let channelCounter = 0
+
 export function startSupabaseRealtimeQuery({
   supabaseClient,
   channelName,
@@ -24,7 +26,7 @@ export function startSupabaseRealtimeQuery({
   void load()
 
   const channel = supabaseClient
-    .channel(channelName)
+    .channel(`${channelName}-${++channelCounter}`)
     .on(
       'postgres_changes',
       { event: '*', schema: 'public', table },

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { memo, useEffect, useState } from 'react'
 import { formatVideoDuration } from '../../utils/videoUtils'
 import './NoteCard.css'
 
@@ -23,9 +23,14 @@ const buildSeed = (value, fallback) => {
   return hash || fallback
 }
 
-export default function NoteCard({ message, index = 0, large = false }) {
+function NoteCard({ message, index = 0, large = false, onClick }) {
   const [photoFailed, setPhotoFailed] = useState(false)
   const [videoUrl, setVideoUrl] = useState('')
+  const isInteractive = typeof onClick === 'function'
+  const handleClick = isInteractive ? () => onClick(message) : undefined
+  const handleKeyDown = isInteractive
+    ? (e) => { if (e.key === 'Enter') onClick(message) }
+    : undefined
 
   useEffect(() => {
     if (!(message.videoBlob instanceof Blob)) {
@@ -70,6 +75,10 @@ export default function NoteCard({ message, index = 0, large = false }) {
         '--skew': `${skew}deg`,
         '--card-width': `${cardWidth}px`
       }}
+      onClick={handleClick}
+      role={isInteractive ? 'button' : undefined}
+      tabIndex={isInteractive ? 0 : undefined}
+      onKeyDown={handleKeyDown}
     >
       <div className="note-tape" />
       {(hasPhoto || hasVideo) && (
@@ -80,10 +89,7 @@ export default function NoteCard({ message, index = 0, large = false }) {
               alt={`Photo by ${message.name}`}
               className="note-photo"
               loading="lazy"
-              onError={(event) => {
-                console.error(`[NoteCard] Failed to load media for "${message.name}":`, event.error)
-                setPhotoFailed(true)
-              }}
+              onError={() => setPhotoFailed(true)}
             />
           ) : hasVideoBlob ? (
             <video
@@ -125,3 +131,5 @@ export default function NoteCard({ message, index = 0, large = false }) {
     </div>
   )
 }
+
+export default memo(NoteCard)

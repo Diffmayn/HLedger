@@ -1,9 +1,8 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useMessages, useBoothPhotos, useBoothVideos, useReactions } from '../../hooks/useDatabase'
+import { useMessages, useBoothPhotos, useBoothVideos } from '../../hooks/useDatabase'
 import useBroadcastChannel from '../../hooks/useBroadcastChannel'
 import { isSupabaseConfigured } from '../../data/supabaseClient'
-import { buildReactionHighlights, buildReactionLeaderboard } from '../../utils/reactionUtils'
 import NoteCard from './NoteCard'
 import BoothPhotoCard from './BoothPhotoCard'
 import VideoEntryCard from './VideoEntryCard'
@@ -14,10 +13,10 @@ import './MainWall.css'
 const PAGE_SIZE = 24
 
 export default function MainWall() {
-  const { messages, addMessage, deleteMessage } = useMessages()
-  const { photos: boothPhotos, deleteBoothPhoto } = useBoothPhotos()
-  const { videos: boothVideos, deleteBoothVideo } = useBoothVideos()
-  const { reactions } = useReactions()
+  const { messages, loaded: messagesLoaded, addMessage, deleteMessage } = useMessages()
+  const { photos: boothPhotos, loaded: photosLoaded, deleteBoothPhoto } = useBoothPhotos()
+  const { videos: boothVideos, loaded: videosLoaded, deleteBoothVideo } = useBoothVideos()
+  const isLoading = !(messagesLoaded && photosLoaded && videosLoaded)
   const navigate = useNavigate()
   const [showModal, setShowModal] = useState(false)
   const [selectedEntry, setSelectedEntry] = useState(null)
@@ -68,31 +67,21 @@ export default function MainWall() {
     if (type === 'video') await deleteBoothVideo(id)
   }, [deleteMessage, deleteBoothPhoto, deleteBoothVideo])
 
-  const handleEntryClick = useCallback((entry) => {
-    setSelectedEntry(entry)
+  const handleMessageClick = useCallback((message) => {
+    setSelectedEntry({ ...message, _type: 'message' })
   }, [])
 
+  const handlePhotoClick = useCallback((photo) => {
+    setSelectedEntry({ ...photo, _type: 'photo' })
+  }, [])
+
+  const handleVideoClick = useCallback((video) => {
+    setSelectedEntry({ ...video, _type: 'video' })
+  }, [])
+
+  const handlePhotoDelete = useCallback((id) => handleDelete('photo', id), [handleDelete])
+
   const notesWithPhotos = messages.filter(m => m.photoDataUrl).length
-  const reactionHighlights = useMemo(() => buildReactionHighlights({
-    messages,
-    boothPhotos,
-    boothVideos,
-    reactions,
-  }), [boothPhotos, boothVideos, messages, reactions])
-  const reactionLeaderboard = useMemo(() => buildReactionLeaderboard({
-    messages,
-    boothPhotos,
-    boothVideos,
-    reactions,
-  }, 5), [boothPhotos, boothVideos, messages, reactions])
-
-  const renderReactionTrail = (sortedBreakdown) => sortedBreakdown.slice(0, 3).map(([emoji, count]) => (
-    <span key={`${emoji}-${count}`} className="wall-highlight-reaction-pill">{emoji} {count}</span>
-  ))
-
-  const openHighlightedEntry = (item) => {
-    setSelectedEntry({ ...item.entry, _type: item.type })
-  }
 
   return (
     <div className="main-wall">
@@ -121,71 +110,13 @@ export default function MainWall() {
         </div>
       </div>
 
-      {reactionHighlights.length > 0 && (
-        <section className="wall-highlights">
-          <div className="wall-highlights-header">
-            <div>
-              <p className="wall-highlights-eyebrow">Crowd favorites</p>
-              <h3>Most loved moments</h3>
-            </div>
-            <div className="wall-highlights-summary">
-              <span>{reactionLeaderboard.length} ranked highlights</span>
-            </div>
-          </div>
-
-          <div className="wall-highlights-layout">
-            <div className="wall-leaderboard">
-              {reactionLeaderboard.map((item, index) => (
-                <button
-                  key={`${item.type}-${item.entry.id}`}
-                  type="button"
-                  className="wall-leaderboard-item"
-                  onClick={() => openHighlightedEntry(item)}
-                >
-                  <span className="wall-leaderboard-rank">#{index + 1}</span>
-                  <span className="wall-leaderboard-copy">
-                    <strong>{item.type === 'message' ? (item.entry.name || 'Anonymous') : item.type === 'photo' ? 'Photo Booth' : 'Video Moment'}</strong>
-                    <span>{item.total} reactions</span>
-                  </span>
-                  <span className="wall-leaderboard-reactions">
-                    {renderReactionTrail(item.sortedBreakdown)}
-                  </span>
-                </button>
-              ))}
-            </div>
-
-            <div className="wall-highlight-cards">
-              {reactionHighlights.map((item, index) => (
-                <div key={`${item.type}-${item.entry.id}`} className="wall-highlight-card">
-                  <div className="wall-highlight-card-header">
-                    <span className="wall-highlight-type">
-                      {item.type === 'message' ? 'Top message' : item.type === 'photo' ? 'Top photo' : 'Top video'}
-                    </span>
-                    <span className="wall-highlight-total">{item.total} reactions</span>
-                  </div>
-                  <div className="wall-highlight-card-body">
-                    {item.type === 'message' ? (
-                      <button type="button" className="wall-highlight-frame" onClick={() => openHighlightedEntry(item)}>
-                        <NoteCard message={item.entry} index={index} large />
-                      </button>
-                    ) : item.type === 'photo' ? (
-                      <BoothPhotoCard photo={item.entry} index={index} large onClick={() => openHighlightedEntry(item)} />
-                    ) : (
-                      <VideoEntryCard video={item.entry} index={index} large autoPlay onClick={() => openHighlightedEntry(item)} />
-                    )}
-                  </div>
-                  <div className="wall-highlight-reactions">
-                    {renderReactionTrail(item.sortedBreakdown)}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
       {/* Main masonry grid */}
-      {allEntries.length === 0 ? (
+      {isLoading && allEntries.length === 0 ? (
+        <div className="wall-empty">
+          <div className="wall-empty-icon">⏳</div>
+          <h3>Loading guestbook…</h3>
+        </div>
+      ) : allEntries.length === 0 ? (
         <div className="wall-empty">
           <div className="wall-empty-icon">📖</div>
           <h3>The guestbook is waiting for its first message!</h3>
@@ -196,8 +127,8 @@ export default function MainWall() {
           {visibleEntries.map((entry, i) => {
             if (entry._type === 'message') {
               return (
-                <div key={`m-${entry.id}`} className="wall-masonry-item" onClick={() => handleEntryClick(entry)}>
-                  <NoteCard message={entry} index={i} />
+                <div key={`m-${entry.id}`} className="wall-masonry-item">
+                  <NoteCard message={entry} index={i} onClick={handleMessageClick} />
                 </div>
               )
             }
@@ -207,15 +138,15 @@ export default function MainWall() {
                   <BoothPhotoCard
                     photo={entry}
                     index={i}
-                    onClick={() => handleEntryClick(entry)}
-                    onDelete={canDeleteEntries ? (id) => handleDelete('photo', id) : undefined}
+                    onClick={handlePhotoClick}
+                    onDelete={canDeleteEntries ? handlePhotoDelete : undefined}
                   />
                 </div>
               )
             }
             return (
               <div key={`v-${entry.id}`} className="wall-masonry-item">
-                <VideoEntryCard video={entry} index={i} onClick={() => handleEntryClick(entry)} autoPlay />
+                <VideoEntryCard video={entry} index={i} onClick={handleVideoClick} autoPlay />
               </div>
             )
           })}

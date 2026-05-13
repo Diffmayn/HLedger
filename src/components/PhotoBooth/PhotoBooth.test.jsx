@@ -8,13 +8,10 @@ const mocks = vi.hoisted(() => ({
   startCamera: vi.fn(),
   stopCamera: vi.fn(),
   captureFrame: vi.fn(),
-  startTracking: vi.fn(),
-  stopTracking: vi.fn(),
   addBoothPhoto: vi.fn(),
   addBoothVideo: vi.fn(),
   broadcast: vi.fn(),
   webcamState: null,
-  trackingState: null,
   composePhotoStrip: vi.fn()
 }))
 
@@ -26,10 +23,6 @@ vi.mock('../../hooks/useWebcam', () => ({
   default: () => mocks.webcamState
 }))
 
-vi.mock('../../hooks/useFaceTracking', () => ({
-  default: () => mocks.trackingState
-}))
-
 vi.mock('../../hooks/useBroadcastChannel', () => ({
   default: () => ({ broadcast: mocks.broadcast })
 }))
@@ -37,14 +30,6 @@ vi.mock('../../hooks/useBroadcastChannel', () => ({
 vi.mock('../../hooks/useDatabase', () => ({
   useBoothPhotos: () => ({ addBoothPhoto: mocks.addBoothPhoto }),
   useBoothVideos: () => ({ addBoothVideo: mocks.addBoothVideo })
-}))
-
-vi.mock('../FaceFilter/FilterOverlay', () => ({
-  default: () => <div data-testid="filter-overlay" />
-}))
-
-vi.mock('../FaceFilter/FilterSelector', () => ({
-  default: () => <div data-testid="filter-selector" />
 }))
 
 vi.mock('./PhotoStrip', () => ({
@@ -69,8 +54,6 @@ describe('PhotoBooth', () => {
     mocks.startCamera.mockReset()
     mocks.stopCamera.mockReset()
     mocks.captureFrame.mockReset()
-    mocks.startTracking.mockReset()
-    mocks.stopTracking.mockReset()
     mocks.addBoothPhoto.mockReset()
     mocks.addBoothVideo.mockReset()
     mocks.broadcast.mockReset()
@@ -83,15 +66,6 @@ describe('PhotoBooth', () => {
       startCamera: mocks.startCamera,
       stopCamera: mocks.stopCamera,
       captureFrame: mocks.captureFrame
-    }
-    mocks.trackingState = {
-      landmarks: [],
-      isTracking: false,
-      isLoading: false,
-      trackingError: '',
-      faceCount: 0,
-      start: mocks.startTracking,
-      stop: mocks.stopTracking
     }
   })
 
@@ -125,7 +99,6 @@ describe('PhotoBooth', () => {
       expect(mocks.addBoothPhoto).toHaveBeenCalledWith({
         photoDataUrl: 'data:image/png;base64,AAAA',
         caption: '',
-        filtersUsed: [],
         isStrip: false
       })
     })
