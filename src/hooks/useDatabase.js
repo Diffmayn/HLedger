@@ -75,7 +75,15 @@ export function useMessages() {
 
   const deleteMessage = useCallback(async (id) => {
     if (isSupabaseConfigured && supabase) {
-      throw new Error('Shared guestbook entries cannot be deleted from the public app.')
+      const { error } = await supabase
+        .from('messages')
+        .delete()
+        .eq('id', String(id))
+
+      if (error) {
+        console.error('[useDatabase] Failed to delete shared message:', error)
+        throw new Error('Unable to delete this message right now. Please try again.')
+      }
     } else {
       await db.messages.delete(id)
       // Also clean up reactions
@@ -147,7 +155,15 @@ export function useBoothPhotos() {
 
   const deleteBoothPhoto = useCallback(async (id) => {
     if (isSupabaseConfigured && supabase) {
-      throw new Error('Shared guestbook entries cannot be deleted from the public app.')
+      const { error } = await supabase
+        .from('booth_photos')
+        .delete()
+        .eq('id', String(id))
+
+      if (error) {
+        console.error('[useDatabase] Failed to delete shared booth photo:', error)
+        throw new Error('Unable to delete this photo right now. Please try again.')
+      }
     } else {
       await db.boothPhotos.delete(id)
       await db.reactions.where({ entryType: 'photo', entryId: id }).delete()

@@ -56,8 +56,8 @@ create table if not exists public.settings (
 );
 
 grant usage on schema public to anon, authenticated;
-grant select, insert on public.messages to anon, authenticated;
-grant select, insert on public.booth_photos to anon, authenticated;
+grant select, insert, delete on public.messages to anon, authenticated;
+grant select, insert, delete on public.booth_photos to anon, authenticated;
 grant select, insert on public.booth_videos to anon, authenticated;
 grant select, insert on public.reactions to anon, authenticated;
 grant select, insert, update, delete on public.speech to anon, authenticated;
@@ -83,6 +83,10 @@ create policy "Public can insert messages"
   with check (true);
 
 drop policy if exists "Public can delete messages" on public.messages;
+create policy "Public can delete messages"
+  on public.messages
+  for delete
+  using (true);
 
 drop policy if exists "Public can read booth photos" on public.booth_photos;
 create policy "Public can read booth photos"
@@ -97,6 +101,10 @@ create policy "Public can insert booth photos"
   with check (true);
 
 drop policy if exists "Public can delete booth photos" on public.booth_photos;
+create policy "Public can delete booth photos"
+  on public.booth_photos
+  for delete
+  using (true);
 
 drop policy if exists "Public can read booth videos" on public.booth_videos;
 create policy "Public can read booth videos"

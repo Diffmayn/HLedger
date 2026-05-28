@@ -2,7 +2,6 @@ import { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useMessages, useBoothPhotos, useBoothVideos } from '../../hooks/useDatabase'
 import useBroadcastChannel from '../../hooks/useBroadcastChannel'
-import { isSupabaseConfigured } from '../../data/supabaseClient'
 import NoteCard from './NoteCard'
 import BoothPhotoCard from './BoothPhotoCard'
 import VideoEntryCard from './VideoEntryCard'
@@ -23,7 +22,7 @@ export default function MainWall() {
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
   const { broadcast } = useBroadcastChannel()
   const loadMoreRef = useRef(null)
-  const canDeleteEntries = !isSupabaseConfigured
+  const canDeleteEntries = true
 
   // Combine all entries into unified feed sorted by timestamp
   const allEntries = useMemo(() => {
