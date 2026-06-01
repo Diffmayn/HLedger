@@ -359,7 +359,10 @@ function buildMessageEntry(msg, cardContentWidth) {
   ]
 
   return {
-    table: { widths: ['*'], body: [[{ stack: cardStack }]] },
+    // dontBreakRows keeps a whole message card together: if it doesn't fit in
+    // the remaining space it moves to the next page instead of being split
+    // across the page break.
+    table: { widths: ['*'], dontBreakRows: true, body: [[{ stack: cardStack }]] },
     layout: messageCardLayout,
     margin: [0, 0, 0, 9]
   }

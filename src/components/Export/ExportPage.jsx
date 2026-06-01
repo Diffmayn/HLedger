@@ -111,6 +111,7 @@ export default function ExportPage() {
   const [isGeneratingPixum, setIsGeneratingPixum] = useState(false)
   const [isZipping, setIsZipping] = useState(false)
   const [isGeneratingHighlights, setIsGeneratingHighlights] = useState(false)
+  const [isExportingImages, setIsExportingImages] = useState(false)
   const [isSavingFolder, setIsSavingFolder] = useState(false)
   const [statusMessage, setStatusMessage] = useState('')
   const [sections, setSections] = useState({
@@ -187,6 +188,57 @@ export default function ExportPage() {
       setStatusMessage('The print-ready PDF could not be created. Please try again.')
     } finally {
       setIsGeneratingPixum(false)
+    }
+  }
+
+  const handleImagesExport = async () => {
+    setStatusMessage('')
+    setIsExportingImages(true)
+    try {
+      const [{ default: JSZip }, { saveAs }, { renderMessageCardImage }] = await Promise.all([
+        import('jszip'),
+        import('file-saver'),
+        import('../../utils/messageImages')
+      ])
+
+      const zip = new JSZip()
+      const cardsFolder = zip.folder('message-cards')
+      const messagePhotosFolder = zip.folder('message-photos')
+
+      const sorted = [...messages].sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0))
+      for (let i = 0; i < sorted.length; i++) {
+        const message = sorted[i]
+        const index = String(i + 1).padStart(2, '0')
+        const name = sanitizeFilePart(message.name || 'anonymous', 'anonymous')
+        const baseName = `${index}-${name}`
+
+        const cardDataUrl = await renderMessageCardImage(message)
+        if (cardDataUrl) {
+          cardsFolder?.file(`${baseName}.png`, dataUrlToBlob(cardDataUrl))
+        }
+
+        if (message.photoDataUrl) {
+          const ext = extensionFromDataUrl(message.photoDataUrl)
+          messagePhotosFolder?.file(`${baseName}.${ext}`, dataUrlToBlob(message.photoDataUrl))
+        }
+      }
+
+      const boothFolder = zip.folder('booth-photos')
+      boothPhotos.forEach((photo, i) => {
+        if (!photo?.photoDataUrl) return
+        const ext = extensionFromDataUrl(photo.photoDataUrl)
+        const label = photo.isStrip ? 'strip' : 'photo'
+        boothFolder?.file(`${String(i + 1).padStart(2, '0')}-booth-${label}.${ext}`, dataUrlToBlob(photo.photoDataUrl))
+      })
+
+      const content = await zip.generateAsync({ type: 'blob' })
+      saveAs(content, 'jeannettes-guestbook-images.zip')
+      setStatusMessage('All messages and photos were exported as images, ready to upload to a Pixum photobook.')
+    } catch (err) {
+      console.error('Image export failed:', err)
+      setStatusMessage('The images could not be exported. Please try again.')
+    } finally {
+      setIsExportingImages(false)
     }
   }
 
@@ -609,6 +661,21 @@ export default function ExportPage() {
             </button>
             <p className="export-page-estimate">A4 portrait · 3&nbsp;mm bleed · ready to order</p>
           </div>
+
+          <button
+            className="export-btn export-btn-images"
+            onClick={handleImagesExport}
+            disabled={isExportingImages || (messages.length === 0 && boothPhotos.length === 0)}
+          >
+            {isExportingImages ? (
+              <span className="export-btn-loading">⏳ Rendering images…</span>
+            ) : (
+              <span>🖼️ Message &amp; Photo Images (Pixum)</span>
+            )}
+          </button>
+          <p className="export-highlights-hint">
+            One image per message plus all photos — upload them as pages in a Pixum photobook.
+          </p>
 
           <button
             className="export-btn export-btn-highlight"
