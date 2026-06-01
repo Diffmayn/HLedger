@@ -1,6 +1,6 @@
 import { Component, useMemo, useState } from 'react'
 import { useMessages, useBoothPhotos, useBoothVideos, useReactions, useSettings, useSpeech } from '../../hooks/useDatabase'
-import { estimateGuestbookPages, generateGuestbookPDF } from '../../utils/pdfExport'
+import { estimateGuestbookPages, generateGuestbookPDF, generatePixumPrintPDF } from '../../utils/pdfExport'
 import { buildReactionLeaderboard } from '../../utils/reactionUtils'
 import SpeechEditor from './SpeechEditor'
 import NotesEditor from './NotesEditor'
@@ -108,6 +108,7 @@ export default function ExportPage() {
   const notes = getSetting('ebookNotes') || ''
 
   const [isGenerating, setIsGenerating] = useState(false)
+  const [isGeneratingPixum, setIsGeneratingPixum] = useState(false)
   const [isZipping, setIsZipping] = useState(false)
   const [isGeneratingHighlights, setIsGeneratingHighlights] = useState(false)
   const [isSavingFolder, setIsSavingFolder] = useState(false)
@@ -165,6 +166,27 @@ export default function ExportPage() {
       setStatusMessage('The PDF could not be created. Please try again.')
     } finally {
       setIsGenerating(false)
+    }
+  }
+
+  const handlePixumExport = async () => {
+    setStatusMessage('')
+    setIsGeneratingPixum(true)
+    try {
+      await generatePixumPrintPDF({
+        messages,
+        boothPhotos,
+        boothVideos,
+        speech,
+        notes,
+        includeSections: sections
+      })
+      setStatusMessage('Your print-ready PDF (A4 + 3mm bleed) is ready. Upload it to Pixum to order a physical book.')
+    } catch (err) {
+      console.error('Pixum print PDF generation failed:', err)
+      setStatusMessage('The print-ready PDF could not be created. Please try again.')
+    } finally {
+      setIsGeneratingPixum(false)
     }
   }
 
@@ -571,6 +593,21 @@ export default function ExportPage() {
               )}
             </button>
             <p className="export-page-estimate">~{estimatedPages} {estimatedPages === 1 ? 'page' : 'pages'}</p>
+          </div>
+
+          <div className="export-pdf-wrap">
+            <button
+              className="export-btn export-btn-pixum"
+              onClick={handlePixumExport}
+              disabled={isGeneratingPixum || !hasSelectedSection}
+            >
+              {isGeneratingPixum ? (
+                <span className="export-btn-loading">⏳ Preparing print file…</span>
+              ) : (
+                <span>🖨️ Print-Ready PDF (Pixum)</span>
+              )}
+            </button>
+            <p className="export-page-estimate">A4 portrait · 3&nbsp;mm bleed · ready to order</p>
           </div>
 
           <button
