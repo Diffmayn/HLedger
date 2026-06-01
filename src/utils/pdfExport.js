@@ -1,4 +1,130 @@
 import { formatVideoDuration } from './videoUtils'
+import { splitEmojiTokens } from './emojiUtils'
+
+// pdfmake embeds the Roboto font, which has no emoji glyphs, so emojis would
+// render as blank boxes. Render the emoji string to a PNG using the platform's
+// colour-emoji font (Segoe UI Emoji on Windows, Apple Color Emoji on macOS,
+// Noto on Linux) so it can be embedded as an image — the same emojis the guest
+// picked then appear in the printed book.
+function renderEmojiImage(emojiString, size = 72) {
+  try {
+    if (typeof document === 'undefined') return null
+    const tokens = splitEmojiTokens(emojiString)
+    if (!tokens.length) return null
+
+    const text = tokens.join('')
+    const font = `${size}px "Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji","Twemoji Mozilla",sans-serif`
+
+    const measureCtx = document.createElement('canvas').getContext('2d')
+    if (!measureCtx) return null
+    measureCtx.font = font
+    const width = Math.max(1, Math.ceil(measureCtx.measureText(text).width))
+    const height = Math.ceil(size * 1.3)
+
+    const scale = 2 // render at 2× for crisp print output
+    const canvas = document.createElement('canvas')
+    canvas.width = width * scale
+    canvas.height = height * scale
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return null
+    ctx.scale(scale, scale)
+    ctx.font = font
+    ctx.textBaseline = 'middle'
+    ctx.textAlign = 'left'
+    ctx.fillText(text, 0, height / 2)
+
+    return { dataUrl: canvas.toDataURL('image/png'), width, height }
+  } catch (_) {
+    return null
+  }
+}
+
+// Build a pdfmake image node for an emoji string, scaled to a target line
+// height (in points) while preserving aspect ratio.
+function emojiImageNode(emojiString, targetHeight = 15) {
+  const rendered = renderEmojiImage(emojiString)
+  if (!rendered) return null
+  const displayWidth = (rendered.width / rendered.height) * targetHeight
+  return { image: rendered.dataUrl, width: displayWidth }
+}
+
+const EMOJI_RE = /\p{Extended_Pictographic}/u
+
+function containsEmoji(value) {
+  return EMOJI_RE.test(String(value || ''))
+}
+
+// pdfmake has no inline images, so a message that mixes text and emojis (e.g.
+// "Great job 🎉 keep it up 😀") cannot be laid out with the Roboto font alone.
+// Render the whole wrapped paragraph to a canvas using a font chain that falls
+// back to the platform colour-emoji font, then embed it sized to display at the
+// exact target width and point size — so it flows like the rest of the book.
+function renderRichTextImage(text, { widthPt, fontSizePt = 10.5, lineHeight = 1.45, color = '#3C2415' }) {
+  try {
+    if (typeof document === 'undefined') return null
+    const source = String(text || '')
+    if (!source) return null
+
+    const scale = 3 // render at 3× so text stays sharp in print
+    const fontPx = fontSizePt * scale
+    const widthPx = Math.max(1, Math.floor(widthPt * scale))
+    const lineHeightPx = fontPx * lineHeight
+    const font = `${fontPx}px "Segoe UI","Helvetica Neue",system-ui,"Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",Arial,sans-serif`
+
+    const measureCtx = document.createElement('canvas').getContext('2d')
+    if (!measureCtx) return null
+    measureCtx.font = font
+
+    const lines = []
+    source.split('\n').forEach((paragraph) => {
+      const words = paragraph.split(/\s+/).filter(Boolean)
+      if (!words.length) {
+        lines.push('')
+        return
+      }
+      let current = ''
+      for (const word of words) {
+        const candidate = current ? `${current} ${word}` : word
+        if (measureCtx.measureText(candidate).width <= widthPx) {
+          current = candidate
+          continue
+        }
+        if (current) lines.push(current)
+        if (measureCtx.measureText(word).width > widthPx) {
+          // Word (or long emoji run) wider than the column — break by grapheme.
+          let chunk = ''
+          for (const grapheme of splitEmojiTokens(word)) {
+            if (chunk && measureCtx.measureText(chunk + grapheme).width > widthPx) {
+              lines.push(chunk)
+              chunk = grapheme
+            } else {
+              chunk += grapheme
+            }
+          }
+          current = chunk
+        } else {
+          current = word
+        }
+      }
+      if (current) lines.push(current)
+    })
+
+    const canvas = document.createElement('canvas')
+    canvas.width = widthPx
+    canvas.height = Math.max(1, Math.ceil(lines.length * lineHeightPx))
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return null
+    ctx.font = font
+    ctx.textBaseline = 'top'
+    ctx.fillStyle = color
+    const topPad = (lineHeightPx - fontPx) / 2
+    lines.forEach((line, i) => ctx.fillText(line, 0, i * lineHeightPx + topPad))
+
+    return { image: canvas.toDataURL('image/png'), width: widthPt }
+  } catch (_) {
+    return null
+  }
+}
 
 function addSectionWithPageBreak(sectionBlocks, section) {
   if (!section.length) return
@@ -143,111 +269,133 @@ function buildNotesPage(notes) {
   ]
 }
 
-function buildMessageEntry(msg) {
-  const items = []
+// Gold left border + warm cream fill, mirroring the .bp-message-card look in
+// the on-screen book preview.
+const messageCardLayout = {
+  hLineWidth: () => 0,
+  vLineWidth: (i) => (i === 0 ? 3 : 0),
+  vLineColor: () => '#C9A84C',
+  fillColor: () => '#FDF6E3',
+  paddingLeft: () => 12,
+  paddingRight: () => 10,
+  paddingTop: () => 9,
+  paddingBottom: () => 9
+}
 
-  if (msg.photoDataUrl) {
-    try {
-      items.push({
-        image: msg.photoDataUrl,
-        width: 180,
-        alignment: 'center',
-        margin: [0, 0, 0, 8]
-      })
-    } catch (_) {
-      // Skip corrupted images in export while preserving the rest of the book.
+function buildMessageBody(msg, textWidthPt) {
+  const body = []
+  const message = msg.message || ''
+
+  // Emojis typed inline in the message body can't render with Roboto, so draw
+  // the whole paragraph to an image when emojis are present; otherwise keep it
+  // as real, selectable text.
+  const richText = containsEmoji(message)
+    ? renderRichTextImage(message, { widthPt: textWidthPt })
+    : null
+
+  if (richText) {
+    body.push(richText)
+  } else {
+    body.push({
+      text: message,
+      fontSize: 10.5,
+      lineHeight: 1.45,
+      color: '#3C2415'
+    })
+  }
+
+  const emoji = emojiImageNode(msg.emojis, 16)
+  if (emoji) {
+    body.push({ ...emoji, margin: [0, 5, 0, 0] })
+  }
+
+  return body
+}
+
+function buildMessageEntry(msg, cardContentWidth) {
+  // Small photo / video thumbnail tucked to the right, like the floated thumb
+  // in the preview card.
+  const thumb = msg.photoDataUrl
+    ? msg.photoDataUrl
+    : (msg.videoThumbnailDataUrl || null)
+
+  // Width available to the message text/emoji image, accounting for card
+  // padding and the thumbnail column when present.
+  const thumbColumn = 64 + 10 // thumb width + column gap
+  const textWidthPt = Math.max(80, (thumb ? cardContentWidth - thumbColumn : cardContentWidth) - 2)
+  const body = buildMessageBody(msg, textWidthPt)
+
+  let topRow
+  if (thumb) {
+    topRow = {
+      columns: [
+        { width: '*', stack: body },
+        {
+          width: 64,
+          stack: [
+            { image: thumb, fit: [64, 64], alignment: 'right' },
+            msg.videoThumbnailDataUrl && !msg.photoDataUrl
+              ? { text: `▶ ${formatVideoDuration(msg.videoDuration)}`, fontSize: 7, color: '#9B8A7C', alignment: 'center', margin: [0, 2, 0, 0] }
+              : null
+          ].filter(Boolean)
+        }
+      ],
+      columnGap: 10
     }
-  } else if (msg.videoThumbnailDataUrl) {
-    items.push({
-      image: msg.videoThumbnailDataUrl,
-      width: 180,
-      alignment: 'center',
-      margin: [0, 0, 0, 8]
-    })
-    items.push({
-      text: `Video message · ${formatVideoDuration(msg.videoDuration)}`,
-      fontSize: 9,
-      color: '#9B8A7C',
-      alignment: 'center',
-      margin: [0, 0, 0, 8]
-    })
+  } else {
+    topRow = { stack: body }
   }
 
-  items.push({
-    text: msg.name || 'Anonymous',
-    fontSize: 14,
-    bold: true,
-    color: '#722F37',
-    margin: [0, 0, 0, 3]
-  })
-  items.push({
-    text: msg.message || '',
-    fontSize: 11,
-    lineHeight: 1.5,
-    color: '#3C2415',
-    margin: [0, 0, 0, 3]
-  })
-
-  if (msg.emojis) {
-    items.push({
-      text: msg.emojis,
-      fontSize: 16,
-      margin: [0, 0, 0, 3]
-    })
-  }
-
-  items.push({
-    text: new Date(msg.timestamp).toLocaleDateString('da-DK', {
-      day: 'numeric', month: 'long', year: 'numeric'
-    }),
-    fontSize: 9,
-    color: '#9B8A7C',
-    italics: true
-  })
+  const cardStack = [
+    topRow,
+    {
+      text: `— ${msg.name || 'Anonymous'}`,
+      fontSize: 11,
+      italics: true,
+      color: '#9C7A22',
+      alignment: 'right',
+      margin: [0, 6, 0, 0]
+    }
+  ]
 
   return {
-    stack: items,
-    margin: [0, 0, 0, 20]
+    table: { widths: ['*'], body: [[{ stack: cardStack }]] },
+    layout: messageCardLayout,
+    margin: [0, 0, 0, 9]
   }
 }
 
-function buildMessagesSection(messages) {
+function buildMessagesSection(messages, cardContentWidth) {
   if (!messages?.length) return []
 
   const content = [
     {
-      text: 'Messages from the Heart',
+      text: 'MESSAGES',
+      alignment: 'center',
+      fontSize: 8,
+      bold: true,
+      characterSpacing: 2,
+      color: '#9C7A22',
+      margin: [0, 30, 0, 3]
+    },
+    {
+      text: 'Messages from Colleagues',
       alignment: 'center',
       fontSize: 22,
       bold: true,
       color: '#722F37',
-      margin: [0, 30, 0, 5]
+      margin: [0, 0, 0, 6]
     },
     {
       canvas: [
-        { type: 'line', x1: 170, y1: 0, x2: 345, y2: 0, lineWidth: 1, lineColor: '#E8D48B' }
+        { type: 'line', x1: 150, y1: 0, x2: 365, y2: 0, lineWidth: 1, lineColor: '#E8D48B' }
       ],
-      margin: [0, 0, 0, 25]
+      margin: [0, 0, 0, 22]
     }
   ]
 
   const sorted = [...messages].sort((a, b) => a.timestamp - b.timestamp)
-  const left = []
-  const right = []
-
-  sorted.forEach((msg, index) => {
-    if (index % 2 === 0) left.push(buildMessageEntry(msg))
-    else right.push(buildMessageEntry(msg))
-  })
-
-  content.push({
-    columns: [
-      { stack: left, width: '48%' },
-      { width: '4%', text: '' },
-      { stack: right, width: '48%' }
-    ],
-    columnGap: 10
-  })
+  sorted.forEach((msg) => content.push(buildMessageEntry(msg, cardContentWidth)))
 
   return content
 }
@@ -443,7 +591,7 @@ export function estimateGuestbookPages({ messages = [], boothPhotos = [], boothV
 
   if (includeSections.cover !== false) total += 1
   if (includeSections.speech && speech?.body) total += 1
-  if (includeSections.messages && messages.length) total += Math.ceil(messages.length / 8)
+  if (includeSections.messages && messages.length) total += Math.ceil(messages.length / 6)
   if (includeSections.photos && boothPhotos.length) {
     const stripCount = boothPhotos.filter(photo => photo?.isStrip).length
     const regularCount = boothPhotos.length - stripCount
@@ -480,8 +628,14 @@ async function loadPdfMake() {
   return pdfMake
 }
 
-function buildSectionBlocks({ messages, boothPhotos, boothVideos, speech, notes, includeSections }) {
+// Message-card content width = page content width minus the card's horizontal
+// padding (12 + 10pt). Used to size canvas-rendered emoji/text images so they
+// flow at the correct width for the chosen page format.
+const CARD_PADDING_X = 22
+
+function buildSectionBlocks({ messages, boothPhotos, boothVideos, speech, notes, includeSections, contentWidth = 495.28 }) {
   const sectionBlocks = []
+  const cardContentWidth = contentWidth - CARD_PADDING_X
 
   if (includeSections.cover !== false) {
     addSectionWithPageBreak(sectionBlocks, buildCoverPage())
@@ -490,7 +644,7 @@ function buildSectionBlocks({ messages, boothPhotos, boothVideos, speech, notes,
     addSectionWithPageBreak(sectionBlocks, buildSpeechPage(speech))
   }
   if (includeSections.messages) {
-    addSectionWithPageBreak(sectionBlocks, buildMessagesSection(messages))
+    addSectionWithPageBreak(sectionBlocks, buildMessagesSection(messages, cardContentWidth))
   }
   if (includeSections.photos) {
     addSectionWithPageBreak(sectionBlocks, buildBoothSection(boothPhotos))
@@ -513,7 +667,8 @@ function buildSectionBlocks({ messages, boothPhotos, boothVideos, speech, notes,
 
 export async function generateGuestbookPDF({ messages = [], boothPhotos = [], boothVideos = [], speech, notes = '', includeSections = {} }) {
   const pdfMake = await loadPdfMake()
-  const content = buildSectionBlocks({ messages, boothPhotos, boothVideos, speech, notes, includeSections })
+  // A4 width (595.28pt) minus the 50pt left/right page margins.
+  const content = buildSectionBlocks({ messages, boothPhotos, boothVideos, speech, notes, includeSections, contentWidth: 595.28 - 100 })
 
   const docDefinition = {
     pageSize: 'A4',
@@ -540,7 +695,6 @@ export async function generateGuestbookPDF({ messages = [], boothPhotos = [], bo
 // important is lost when the book is trimmed and bound.
 export async function generatePixumPrintPDF({ messages = [], boothPhotos = [], boothVideos = [], speech, notes = '', includeSections = {} }) {
   const pdfMake = await loadPdfMake()
-  const content = buildSectionBlocks({ messages, boothPhotos, boothVideos, speech, notes, includeSections })
 
   const bleed = 3 * MM_TO_PT
   const pageWidth = (210 + 6) * MM_TO_PT   // 216mm
@@ -549,6 +703,11 @@ export async function generatePixumPrintPDF({ messages = [], boothPhotos = [], b
   // on the inside edge for the binding.
   const safe = 10 * MM_TO_PT
   const innerMargin = 13 * MM_TO_PT
+
+  const content = buildSectionBlocks({
+    messages, boothPhotos, boothVideos, speech, notes, includeSections,
+    contentWidth: pageWidth - innerMargin - safe
+  })
 
   const docDefinition = {
     pageSize: { width: pageWidth, height: pageHeight },

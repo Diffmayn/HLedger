@@ -47,4 +47,14 @@ describe('pdfExport font (vfs) resolution', () => {
     // Full-page paper background guarantees bleed coverage after trimming.
     expect(typeof doc.background).toBe('function')
   })
+
+  it('exports messages with emojis in the body and emoji field without throwing', async () => {
+    await expect(generateGuestbookPDF({
+      ...sampleArgs,
+      messages: [
+        { id: 1, name: 'Ada', message: 'Great work 🎉 keep it up 😀', emojis: '❤️🥳', timestamp: Date.now() }
+      ]
+    })).resolves.toBeUndefined()
+    expect(createPdf).toHaveBeenCalledTimes(1)
+  })
 })
