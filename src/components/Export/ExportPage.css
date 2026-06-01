@@ -197,6 +197,11 @@
   color: var(--text-dark);
 }
 
+.export-btn-pixum {
+  background: linear-gradient(135deg, #2b4c7e, #1f3a63);
+  color: #f4f7fc;
+}
+
 .export-btn-highlight {
   background: linear-gradient(135deg, #165c53, #2f7a5f);
   color: #f8f4ea;

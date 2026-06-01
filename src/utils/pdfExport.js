@@ -9,8 +9,9 @@ function buildCoverPage() {
   return [
     {
       canvas: [
-        // Full-page burgundy background
-        { type: 'rect', x: -40, y: -40, w: 595, h: 842, color: '#5A252C' }
+        // Full-page burgundy background. Oversized so it bleeds past the trim
+        // edge on both standard A4 (595×842pt) and Pixum bleed pages (612×859pt).
+        { type: 'rect', x: -60, y: -60, w: 740, h: 1000, color: '#5A252C' }
       ],
       absolutePosition: { x: 0, y: 0 }
     },
@@ -455,16 +456,31 @@ export function estimateGuestbookPages({ messages = [], boothPhotos = [], boothV
   return Math.max(total, 1)
 }
 
-export async function generateGuestbookPDF({ messages = [], boothPhotos = [], boothVideos = [], speech, notes = '', includeSections = {} }) {
-  const [{ default: pdfMake }, pdfFonts] = await Promise.all([
+// Millimetre → PDF point (72dpi) conversion for print-format page sizing.
+const MM_TO_PT = 72 / 25.4
+
+async function loadPdfMake() {
+  const [pdfMakeModule, pdfFontsModule] = await Promise.all([
     import('pdfmake/build/pdfmake'),
     import('pdfmake/build/vfs_fonts')
   ])
 
-  if (pdfMake.vfs === undefined) {
-    pdfMake.vfs = pdfFonts.pdfMake ? pdfFonts.pdfMake.vfs : pdfFonts.default?.pdfMake?.vfs || pdfFonts.vfs
+  const pdfMake = pdfMakeModule.default || pdfMakeModule
+
+  // pdfmake 0.2.x ships vfs_fonts as `module.exports = vfs`, so under Vite/ESM
+  // interop the font table is the module's default export — not `.pdfMake.vfs`
+  // (the shape older releases used). Resolve the default first, then fall back
+  // through the legacy shapes, so the embedded Roboto fonts are always found.
+  // Without this createPdf() throws and no file is produced.
+  if (!pdfMake.vfs) {
+    const fonts = pdfFontsModule.default || pdfFontsModule
+    pdfMake.vfs = fonts.vfs || fonts.pdfMake?.vfs || fonts
   }
 
+  return pdfMake
+}
+
+function buildSectionBlocks({ messages, boothPhotos, boothVideos, speech, notes, includeSections }) {
   const sectionBlocks = []
 
   if (includeSections.cover !== false) {
@@ -489,10 +505,15 @@ export async function generateGuestbookPDF({ messages = [], boothPhotos = [], bo
     addSectionWithPageBreak(sectionBlocks, buildBackCover())
   }
 
-  const content = sectionBlocks.flatMap((section, index) => {
+  return sectionBlocks.flatMap((section, index) => {
     if (index === sectionBlocks.length - 1) return section
     return [...section, { text: '', pageBreak: 'after' }]
   })
+}
+
+export async function generateGuestbookPDF({ messages = [], boothPhotos = [], boothVideos = [], speech, notes = '', includeSections = {} }) {
+  const pdfMake = await loadPdfMake()
+  const content = buildSectionBlocks({ messages, boothPhotos, boothVideos, speech, notes, includeSections })
 
   const docDefinition = {
     pageSize: 'A4',
@@ -511,4 +532,46 @@ export async function generateGuestbookPDF({ messages = [], boothPhotos = [], bo
   }
 
   pdfMake.createPdf(docDefinition).download('Jeannettes-25th-Anniversary-Guestbook.pdf')
+}
+
+// A4 portrait photo book with 3mm bleed on every edge, sized for print-on-demand
+// services such as Pixum. Trim size is 210×297mm; with 3mm bleed each side the
+// page becomes 216×303mm. Content sits inside a safety margin so nothing
+// important is lost when the book is trimmed and bound.
+export async function generatePixumPrintPDF({ messages = [], boothPhotos = [], boothVideos = [], speech, notes = '', includeSections = {} }) {
+  const pdfMake = await loadPdfMake()
+  const content = buildSectionBlocks({ messages, boothPhotos, boothVideos, speech, notes, includeSections })
+
+  const bleed = 3 * MM_TO_PT
+  const pageWidth = (210 + 6) * MM_TO_PT   // 216mm
+  const pageHeight = (297 + 6) * MM_TO_PT  // 303mm
+  // ~10mm safe margin from the trimmed edge (bleed + 7mm safety); a little extra
+  // on the inside edge for the binding.
+  const safe = 10 * MM_TO_PT
+  const innerMargin = 13 * MM_TO_PT
+
+  const docDefinition = {
+    pageSize: { width: pageWidth, height: pageHeight },
+    pageMargins: [innerMargin, safe, safe, safe],
+    // Warm paper fills the whole page edge-to-edge so trimming never exposes a
+    // white sliver on full-bleed interior pages.
+    background: () => ({
+      canvas: [
+        { type: 'rect', x: 0, y: 0, w: pageWidth, h: pageHeight, color: '#FFFDF8' }
+      ]
+    }),
+    content,
+    footer: (currentPage, pageCount) => ({
+      columns: [
+        { text: "Jeannette's 25th Anniversary", fontSize: 8, color: '#C9A84C', margin: [innerMargin, 0, 0, 0] },
+        { text: `${currentPage} / ${pageCount}`, alignment: 'right', fontSize: 8, color: '#9B8A7C', margin: [0, 0, safe, 0] }
+      ],
+      margin: [0, bleed, 0, 0]
+    }),
+    defaultStyle: {
+      font: 'Roboto'
+    }
+  }
+
+  pdfMake.createPdf(docDefinition).download('Jeannettes-Guestbook-Pixum-Print.pdf')
 }

@@ -184,6 +184,8 @@
 /* ── Book Page (A4 aspect ratio) ────────────────────────────────────────────── */
 .bp-page {
   width: 100%;
+  /* aspect-ratio acts as a minimum page height; with visible overflow the page
+     grows to fit its content instead of clipping messages/photos. */
   aspect-ratio: 210 / 297;
   background: linear-gradient(170deg, #fffef9 0%, #fff9f0 100%);
   border-radius: 3px 10px 10px 3px;
@@ -191,7 +193,7 @@
   display: flex;
   flex-direction: column;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
   box-shadow:
     0 2px 4px rgba(0,0,0,0.08),
     0 8px 20px rgba(60,36,21,0.12),
@@ -350,7 +352,7 @@
   line-height: 1.8;
   color: var(--text-medium);
   flex: 1;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .bp-speech-body p + p {
@@ -371,7 +373,7 @@
   flex-direction: column;
   gap: 7px;
   flex: 1;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .bp-message-card {
@@ -509,7 +511,7 @@
 /* ── Notes ──────────────────────────────────────────────────────────────────── */
 .bp-notes-lined {
   flex: 1;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .bp-notes-line {
@@ -632,7 +634,7 @@
   }
   .bp-page {
     width: 210mm;
-    height: 297mm;
+    min-height: 297mm;
     aspect-ratio: auto;
     page-break-after: always;
     box-shadow: none;
