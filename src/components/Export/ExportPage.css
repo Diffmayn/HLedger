@@ -202,6 +202,11 @@
   color: #f4f7fc;
 }
 
+.export-btn-images {
+  background: linear-gradient(135deg, #6d4ea8, #4f3680);
+  color: #f6f2fb;
+}
+
 .export-btn-highlight {
   background: linear-gradient(135deg, #165c53, #2f7a5f);
   color: #f8f4ea;
