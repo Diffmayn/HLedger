@@ -643,9 +643,6 @@ function buildSectionBlocks({ messages, boothPhotos, boothVideos, speech, notes,
   if (includeSections.cover !== false) {
     addSectionWithPageBreak(sectionBlocks, buildCoverPage())
   }
-  if (includeSections.speech) {
-    addSectionWithPageBreak(sectionBlocks, buildSpeechPage(speech))
-  }
   if (includeSections.messages) {
     addSectionWithPageBreak(sectionBlocks, buildMessagesSection(messages, cardContentWidth))
   }
@@ -657,6 +654,10 @@ function buildSectionBlocks({ messages, boothPhotos, boothVideos, speech, notes,
   }
   if (includeSections.notes) {
     addSectionWithPageBreak(sectionBlocks, buildNotesPage(notes))
+  }
+  // The speech closes the book, on the last pages before the back cover.
+  if (includeSections.speech) {
+    addSectionWithPageBreak(sectionBlocks, buildSpeechPage(speech))
   }
   if (includeSections.backCover !== false) {
     addSectionWithPageBreak(sectionBlocks, buildBackCover())

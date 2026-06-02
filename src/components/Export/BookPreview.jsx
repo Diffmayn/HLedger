@@ -179,9 +179,6 @@ export default function BookPreview({ messages, boothPhotos, boothVideos, speech
     if (sections?.cover !== false)
       out.push({ type: 'cover', label: 'Cover', pageNum: pageNum++ })
 
-    if (sections?.speech !== false && speech?.body)
-      out.push({ type: 'speech', label: 'Speech', pageNum: pageNum++, title: speech.title, body: speech.body, author: speech.author })
-
     if (sections?.messages !== false && messages.length > 0) {
       chunkItems(messages, 3).forEach((items, i) => out.push({
         type: 'messages', label: `Messages ${i + 1}`, pageNum: pageNum++,
@@ -208,6 +205,9 @@ export default function BookPreview({ messages, boothPhotos, boothVideos, speech
 
     if (sections?.notes !== false && notes?.trim())
       out.push({ type: 'notes', label: 'Notes', pageNum: pageNum++, body: notes.trim() })
+
+    if (sections?.speech !== false && speech?.body)
+      out.push({ type: 'speech', label: 'Speech', pageNum: pageNum++, title: speech.title, body: speech.body, author: speech.author })
 
     if (sections?.backCover !== false)
       out.push({ type: 'back', label: 'Back Cover', pageNum: pageNum++ })
