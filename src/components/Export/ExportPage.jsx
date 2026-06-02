@@ -602,11 +602,11 @@ export default function ExportPage() {
             <h3>📖 Book Sections</h3>
             {[
               { key: 'cover',     icon: '🎨', label: 'Cover Page',        count: null },
-              { key: 'speech',    icon: '🎤', label: "Boss's Speech",     count: speech?.body ? '✓' : null },
               { key: 'messages',  icon: '💬', label: 'Guest Messages',    count: messages.length || null },
               { key: 'photos',    icon: '📸', label: 'Booth Photos',      count: boothPhotos.length || null },
               { key: 'videos',    icon: '🎥', label: 'Videos',            count: (messageVideos.length + boothVideos.length) || null, optin: true },
               { key: 'notes',     icon: '📝', label: 'Personal Notes',    count: notes.trim() ? '✓' : null },
+              { key: 'speech',    icon: '🎤', label: "Boss's Speech",     count: speech?.body ? '✓' : null },
               { key: 'backCover', icon: '🌟', label: 'Back Cover',        count: null }
             ].map(({ key, icon, label, count, optin }) => (
               <label key={key} className="export-checkbox">
