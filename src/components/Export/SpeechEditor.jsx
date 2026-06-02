@@ -49,9 +49,9 @@ export default function SpeechEditor({ speech, saveSpeech }) {
             onChange={(e) => setBody(e.target.value)}
             placeholder="Write the boss's speech or message here..."
             rows={8}
-            maxLength={3000}
+            maxLength={30000}
           />
-          <span className="speech-count">{body.length}/3000</span>
+          <span className="speech-count">{body.length}/30000</span>
         </div>
 
         <div className="speech-group">
