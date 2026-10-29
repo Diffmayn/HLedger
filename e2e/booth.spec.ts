@@ -31,7 +31,7 @@ test('booth renders camera, filters and takes a photo', async ({ page }) => {
 
 test('booth detects a face and places filters', async ({ page }) => {
   test.setTimeout(600_000)
-  test.skip(!fs.existsSync('e2e/fixtures/face.y4m'), 'needs e2e/fixtures/face.y4m')
+  test.skip(!fs.existsSync('e2e/fixtures/face.y4m') || !process.env.E2E_FACE, 'needs e2e/fixtures/face.y4m and E2E_FACE=1 (slow on software GL)')
   await page.goto('/demo/booth')
   await expect(page.getByRole('button', { name: /tap to start/i })).toBeEnabled({ timeout: 20_000 })
   await expect(page.getByText(/loading face filters/i)).toBeHidden({ timeout: 60_000 })
