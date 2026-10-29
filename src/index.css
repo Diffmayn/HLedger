@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import './fonts.css';
 
 /* Fonts: self-hosted in public/fonts when available; system stacks until then. */
 @theme {

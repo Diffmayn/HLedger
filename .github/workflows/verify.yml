@@ -39,7 +39,7 @@ jobs:
             -d '{"email":"host@example.com","password":"ci-password-123","email_confirm":true}' > /dev/null
           psql "$DB_URL" -v ON_ERROR_STOP=1 -f supabase/seed.sql
 
-      - run: npm install --no-audit --no-fund
+      - run: npm ci
       - run: npx playwright install --with-deps chromium
 
       - name: Fetch fonts (published to ci-artifacts for committing)

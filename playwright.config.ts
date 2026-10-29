@@ -1,4 +1,7 @@
 import { defineConfig, devices } from '@playwright/test'
+import fs from 'node:fs'
+
+const faceClip = 'e2e/fixtures/face.y4m'
 
 export default defineConfig({
   testDir: './e2e',
@@ -25,7 +28,7 @@ export default defineConfig({
           args: [
             '--use-fake-ui-for-media-stream',
             '--use-fake-device-for-media-stream',
-            '--use-file-for-fake-video-capture=e2e/fixtures/face.y4m',
+            ...(fs.existsSync(faceClip) ? [`--use-file-for-fake-video-capture=${faceClip}`] : []),
           ],
         },
         permissions: ['camera'],
