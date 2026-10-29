@@ -21,6 +21,11 @@ export async function signInWithEmail(email: string, redirectTo: string) {
   if (error) throw error
 }
 
+export async function signInWithPassword(email: string, password: string) {
+  const { error } = await supabase().auth.signInWithPassword({ email, password })
+  if (error) throw error
+}
+
 export async function signOut() {
   await supabase().auth.signOut()
 }

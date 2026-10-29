@@ -63,6 +63,9 @@ const strings = {
     host: {
       signIn: 'Sign in',
       email: 'Email',
+      password: 'Password',
+      usePassword: 'Sign in with a password instead',
+      useMagicLink: 'Send me a magic link instead',
       sendLink: 'Send magic link',
       linkSent: 'Check your inbox for the sign-in link.',
       signOut: 'Sign out',
@@ -146,6 +149,9 @@ const strings = {
     host: {
       signIn: 'Log ind',
       email: 'E-mail',
+      password: 'Adgangskode',
+      usePassword: 'Log ind med adgangskode i stedet',
+      useMagicLink: 'Send mig et login-link i stedet',
       sendLink: 'Send login-link',
       linkSent: 'Tjek din indbakke for login-linket.',
       signOut: 'Log ud',

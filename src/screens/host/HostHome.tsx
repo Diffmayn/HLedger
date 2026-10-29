@@ -4,7 +4,7 @@ import { LogOut, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Spinner } from '@/components/ui/Spinner'
 import { toast } from '@/components/ui/toastStore'
-import { signInWithEmail, signOut, useSession } from '@/data/auth'
+import { signInWithEmail, signInWithPassword, signOut, useSession } from '@/data/auth'
 import { useMyEvents, useUpsertEvent } from '@/data/events'
 import { useT } from '@/i18n'
 import { EventForm } from './EventForm'
@@ -14,6 +14,8 @@ export default function HostHome() {
   const t = useT()
   const [email, setEmail] = useState('')
   const [sent, setSent] = useState(false)
+  const [password, setPassword] = useState('')
+  const [usePassword, setUsePassword] = useState(false)
   const [creating, setCreating] = useState(false)
   const events = useMyEvents(Boolean(session))
   const upsert = useUpsertEvent()
@@ -38,8 +40,12 @@ export default function HostHome() {
             onSubmit={async (e) => {
               e.preventDefault()
               try {
-                await signInWithEmail(email, `${window.location.origin}${import.meta.env.BASE_URL}host`)
-                setSent(true)
+                if (usePassword) {
+                  await signInWithPassword(email, password)
+                } else {
+                  await signInWithEmail(email, `${window.location.origin}${import.meta.env.BASE_URL}host`)
+                  setSent(true)
+                }
               } catch (err) {
                 toast.error((err as Error).message)
               }
@@ -56,9 +62,25 @@ export default function HostHome() {
                 autoComplete="email"
               />
             </label>
+            {usePassword && (
+              <label className="flex flex-col gap-1">
+                <span className="text-sm text-ink-2">{t('host.password')}</span>
+                <input
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="h-12 rounded-xl border bg-surface px-4 outline-none focus:border-accent"
+                  autoComplete="current-password"
+                />
+              </label>
+            )}
             <Button type="submit" size="lg">
-              {t('host.sendLink')}
+              {usePassword ? t('host.signIn') : t('host.sendLink')}
             </Button>
+            <button type="button" className="text-sm text-ink-3 underline-offset-4 hover:underline" onClick={() => setUsePassword((v) => !v)}>
+              {usePassword ? t('host.useMagicLink') : t('host.usePassword')}
+            </button>
           </form>
         )}
       </div>

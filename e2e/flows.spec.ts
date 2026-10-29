@@ -66,3 +66,48 @@ test('host screen asks for sign-in', async ({ page }) => {
   await page.goto('/host')
   await page.screenshot({ path: `${shots}/host-signin.png`, fullPage: true })
 })
+
+test('host signs in, moderates, edits speech and sees links', async ({ page }) => {
+  test.skip(!process.env.E2E_HOST_EMAIL, 'needs host credentials')
+  await page.goto('/host')
+  await page.getByRole('button', { name: /password instead/i }).click()
+  await page.getByLabel(/email/i).fill(process.env.E2E_HOST_EMAIL!)
+  await page.getByLabel(/password/i).fill(process.env.E2E_HOST_PASSWORD!)
+  await page.getByRole('button', { name: /^sign in$/i }).click()
+  await expect(page.getByText('Demo Guestbook')).toBeVisible({ timeout: 15_000 })
+  await page.screenshot({ path: `${shots}/host-home.png`, fullPage: true })
+  await page.getByRole('link', { name: /open/i }).first().click()
+  await expect(page.getByRole('heading', { name: 'Demo Guestbook' })).toBeVisible({ timeout: 15_000 })
+
+  // Moderation: published tab has the seeded entries; hide one and restore it.
+  await page.getByRole('button', { name: /^published/i }).click()
+  await page.screenshot({ path: `${shots}/host-moderation.png`, fullPage: true })
+  const hide = page.getByRole('button', { name: /^hide$/i }).first()
+  await hide.click()
+  await page.getByRole('button', { name: /^hidden/i }).click()
+  await expect(page.getByRole('button', { name: /restore/i }).first()).toBeVisible({ timeout: 10_000 })
+  await page.getByRole('button', { name: /restore/i }).first().click()
+  await expect(page.getByRole('button', { name: /restore/i })).toHaveCount(0, { timeout: 10_000 })
+
+  await page.getByRole('button', { name: /links/i }).click()
+  await expect(page.getByAltText(/qr code/i).first()).toBeVisible({ timeout: 10_000 })
+  await page.screenshot({ path: `${shots}/host-links.png`, fullPage: true })
+
+  await page.getByRole('button', { name: /settings/i }).click()
+  await page.screenshot({ path: `${shots}/host-settings.png`, fullPage: true })
+
+  await page.getByRole('button', { name: /speech/i }).click()
+  await page.getByPlaceholder('Title').fill('A few words')
+  await page.getByPlaceholder(/the speech/i).fill('Thank you all for coming.')
+  await page.getByRole('button', { name: /^save$/i }).click()
+  await expect(page.getByText(/^saved$/i)).toBeVisible({ timeout: 10_000 })
+  await page.screenshot({ path: `${shots}/host-speech.png`, fullPage: true })
+
+  await page.getByRole('button', { name: /export/i }).click()
+  await page.screenshot({ path: `${shots}/host-export.png`, fullPage: true })
+  const [download] = await Promise.all([
+    page.waitForEvent('download', { timeout: 30_000 }),
+    page.getByRole('button', { name: /download/i }).first().click(),
+  ])
+  expect(download.suggestedFilename()).toMatch(/\.csv$/)
+})

@@ -45,14 +45,16 @@ jobs:
       - name: Build
         run: |
           source .supabase.sh
-          VITE_SUPABASE_URL="$API_URL" VITE_SUPABASE_ANON_KEY="$ANON_KEY" npm run build
+          VITE_BASE=/ VITE_SUPABASE_URL="$API_URL" VITE_SUPABASE_ANON_KEY="$ANON_KEY" npm run build
 
       - name: Playwright
         id: e2e
         run: |
+          set -o pipefail
           source .supabase.sh
           mkdir -p e2e/screens
-          VITE_SUPABASE_URL="$API_URL" VITE_SUPABASE_ANON_KEY="$ANON_KEY" \
+          VITE_BASE=/ VITE_SUPABASE_URL="$API_URL" VITE_SUPABASE_ANON_KEY="$ANON_KEY" \
+            E2E_HOST_EMAIL=host@example.com E2E_HOST_PASSWORD=ci-password-123 \
             npx playwright test --project=desktop --project=booth --reporter=list,json 2>&1 | tee e2e/screens/playwright.txt
         continue-on-error: true
 
