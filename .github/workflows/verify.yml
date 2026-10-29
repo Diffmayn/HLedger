@@ -42,6 +42,10 @@ jobs:
       - run: npm install --no-audit --no-fund
       - run: npx playwright install --with-deps chromium
 
+      - name: Fetch fonts (published to ci-artifacts for committing)
+        run: node scripts/fetch-fonts.mjs
+        continue-on-error: true
+
       - name: Build
         run: |
           source .supabase.sh
@@ -64,6 +68,8 @@ jobs:
           set -e
           mkdir -p out && cp -r e2e/screens/. out/ 2>/dev/null || true
           cp package-lock.json out/package-lock.json
+          mkdir -p out/fonts && cp public/fonts/*.woff2 out/fonts/ 2>/dev/null || true
+          cp src/fonts.css out/fonts.css 2>/dev/null || true
           cp test-results/.last-run.json out/last-run.json 2>/dev/null || true
           for f in $(find test-results -name 'error-context.md' 2>/dev/null); do cp "$f" "out/$(basename $(dirname $f)).md"; done
           ls -la out
