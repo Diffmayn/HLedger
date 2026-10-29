@@ -65,6 +65,7 @@ jobs:
           mkdir -p out && cp -r e2e/screens/. out/ 2>/dev/null || true
           cp package-lock.json out/package-lock.json
           cp test-results/.last-run.json out/last-run.json 2>/dev/null || true
+          for f in $(find test-results -name 'error-context.md' 2>/dev/null); do cp "$f" "out/$(basename $(dirname $f)).md"; done
           ls -la out
           cd out
           git init -q -b ci-artifacts

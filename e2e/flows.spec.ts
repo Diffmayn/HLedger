@@ -5,6 +5,15 @@ test.skip(!process.env.VITE_SUPABASE_URL, 'needs a Supabase instance')
 
 const shots = 'e2e/screens'
 
+import fs from 'node:fs'
+test.beforeEach(({ page }, info) => {
+  const log = (line: string) => fs.appendFileSync(`${shots}/console.txt`, `[${info.title}] ${line}\n`)
+  page.on('console', (m) => (m.type() === 'error' || m.type() === 'warning') && log(`${m.type()}: ${m.text()}`))
+  page.on('pageerror', (e) => log(`pageerror: ${e.message}`))
+  page.on('requestfailed', (r) => log(`requestfailed: ${r.url()} ${r.failure()?.errorText ?? ''}`))
+  page.on('response', (r) => r.status() >= 400 && log(`http ${r.status()}: ${r.url()}`))
+})
+
 test('guest posts a message and the wall shows it', async ({ page, browser }) => {
   await page.goto('/demo')
   await page.screenshot({ path: `${shots}/guest-1-name.png`, fullPage: true })
@@ -15,6 +24,8 @@ test('guest posts a message and the wall shows it', async ({ page, browser }) =>
   await page.getByRole('button', { name: /next/i }).click()
   await page.screenshot({ path: `${shots}/guest-3-media.png`, fullPage: true })
   await page.getByRole('button', { name: /send to the wall/i }).click()
+  await page.waitForTimeout(2500)
+  await page.screenshot({ path: `${shots}/guest-4-after-send.png`, fullPage: true })
   await expect(page.getByText(/on the wall/i)).toBeVisible({ timeout: 15_000 })
   await page.screenshot({ path: `${shots}/guest-4-done.png`, fullPage: true })
 

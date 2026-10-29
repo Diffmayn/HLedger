@@ -24,7 +24,10 @@ export const useToast = create<ToastState>((set, get) => ({
 
 export const toast = {
   success: (m: string) => useToast.getState().push('success', m),
-  error: (m: string) => useToast.getState().push('error', m, 6000),
+  error: (m: string) => {
+    console.error('[toast]', m)
+    useToast.getState().push('error', m, 6000)
+  },
   info: (m: string) => useToast.getState().push('info', m),
 }
 
