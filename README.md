@@ -18,7 +18,21 @@ See [PLAN.md](PLAN.md) for the review, architecture and phase plan.
 
 React 19 · TypeScript · Vite 7 · Tailwind v4 · TanStack Query · Zustand · Supabase (Postgres + RLS, Storage, Realtime, Auth) · MediaPipe FaceLandmarker + Three.js for the AR booth.
 
-## Setup
+## Run it locally
+
+Needs Node 22 and Docker Desktop (running).
+
+```bash
+git clone -b v2 https://github.com/Diffmayn/HLedger.git && cd HLedger
+npm ci
+npm run local:start     # local Supabase in Docker; first run downloads images (~5 min)
+npm run local:setup     # writes .env.local, creates host user + demo event
+npm run dev
+```
+
+Then open http://localhost:3000/demo (guest), `/demo/wall`, `/demo/booth`, and `/host` (choose "Sign in with a password instead": `host@example.com` / `password123`). `npm run local:stop` shuts Supabase down.
+
+## Setup (hosted)
 
 ```bash
 nvm use            # Node 22
