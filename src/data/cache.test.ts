@@ -12,12 +12,13 @@ vi.mock('@/lib/supabase', () => ({
 const { applyEntryChange, entriesKey } = await import('./entries')
 const { applyReactionChange, reactionsKey, summarize } = await import('./reactions')
 import type { Entry } from '@/types/domain'
+import type { EntryRow } from '@/types/database'
 
-function row(id: string, extra: Record<string, unknown> = {}) {
+function row(id: string, extra: Partial<EntryRow> = {}): EntryRow {
   return {
     id,
     event_id: 'ev',
-    kind: 'message',
+    kind: 'message' as const,
     author_name: 'A',
     body: 'hi',
     emojis: '',
@@ -27,8 +28,8 @@ function row(id: string, extra: Record<string, unknown> = {}) {
     width: null,
     height: null,
     duration_ms: 0,
-    filters_used: [],
-    status: 'published',
+    filters_used: [] as string[],
+    status: 'published' as const,
     client_id: 'c',
     created_at: `2026-10-29T10:0${id}:00Z`,
     ...extra,
