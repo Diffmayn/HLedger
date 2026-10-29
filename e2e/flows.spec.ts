@@ -29,6 +29,17 @@ test('guest posts a message and the wall shows it', async ({ page, browser }) =>
   await expect(page.getByText(/on the wall/i)).toBeVisible({ timeout: 15_000 })
   await page.screenshot({ path: `${shots}/guest-4-done.png`, fullPage: true })
 
+  // Feed with reactions.
+  await page.getByRole('link', { name: /see the wall/i }).click()
+  await expect(page.getByText('Playwright Guest')).toBeVisible({ timeout: 15_000 })
+  const heart = page.getByRole('button', { name: /^❤️/ }).first()
+  await heart.click()
+  await expect(heart).toHaveAttribute('aria-pressed', 'true')
+  await expect(heart).toContainText('1', { timeout: 10_000 })
+  await page.screenshot({ path: `${shots}/guest-5-feed.png`, fullPage: true })
+  await heart.click()
+  await expect(heart).toHaveAttribute('aria-pressed', 'false')
+
   const wall = await browser.newPage({ viewport: { width: 1920, height: 1080 } })
   await wall.goto('/demo/wall')
   await expect(wall.getByText('Playwright Guest')).toBeVisible({ timeout: 15_000 })

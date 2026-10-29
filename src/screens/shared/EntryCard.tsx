@@ -99,7 +99,7 @@ export const EntryCard = memo(function EntryCard({
               alt={entry.body || `Photo from ${entry.authorName || 'a guest'}`}
               width={entry.width ?? undefined}
               height={entry.height ?? undefined}
-              className="h-full w-full object-cover"
+              className={cn('h-full w-full object-cover', large && entry.kind === 'photo' && 'animate-kenburns')}
               loading="lazy"
               decoding="async"
             />

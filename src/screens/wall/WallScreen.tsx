@@ -105,7 +105,7 @@ export default function WallScreen() {
         </div>
       </header>
 
-      <main className="relative flex-1 overflow-hidden px-10 pb-6">
+      <main className="relative min-h-0 flex-1 overflow-hidden px-10 pb-6">
         {published.length === 0 ? (
           <div className="grid h-full place-items-center">
             <div className="flex flex-col items-center gap-8 text-center">
@@ -115,7 +115,7 @@ export default function WallScreen() {
             </div>
           </div>
         ) : mode === 'slideshow' && current ? (
-          <div key={`${current.id}-${slide}`} className="grid h-full place-items-center animate-rise">
+          <div key={`${current.id}-${slide}`} className="flex h-full items-center justify-center animate-rise">
             <div className={cn('w-full', current.kind === 'message' ? 'max-w-4xl' : current.kind === 'strip' ? 'max-w-sm' : 'max-w-5xl')}>
               <EntryCard entry={current} reactions={reactions.get(current.id)} size="large" autoplayVideo className="rotate-0" />
             </div>

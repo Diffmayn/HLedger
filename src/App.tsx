@@ -8,6 +8,7 @@ import { NotConfigured } from '@/screens/shared/NotConfigured'
 import { Landing } from '@/screens/shared/Landing'
 
 const GuestScreen = lazy(() => import('@/screens/guest/GuestScreen'))
+const GuestFeed = lazy(() => import('@/screens/guest/GuestFeed'))
 const WallScreen = lazy(() => import('@/screens/wall/WallScreen'))
 const BoothScreen = lazy(() => import('@/screens/booth/BoothScreen'))
 const HostScreen = lazy(() => import('@/screens/host/HostScreen'))
@@ -31,6 +32,7 @@ export function App() {
           <Route path="/host" element={<HostHome />} />
           <Route path="/:slug" element={<EventLayout />}>
             <Route index element={<GuestScreen />} />
+            <Route path="feed" element={<GuestFeed />} />
             <Route path="wall" element={<WallScreen />} />
             <Route path="booth" element={<BoothScreen />} />
             <Route path="host" element={<HostScreen />} />

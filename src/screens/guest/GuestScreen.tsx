@@ -249,7 +249,7 @@ export default function GuestScreen() {
           <div className="flex w-full flex-col gap-3">
             <Button size="xl" onClick={reset}>{t('guest.another')}</Button>
             <Button asChild variant="ghost" size="lg">
-              <Link to="wall">{t('guest.viewWall')}</Link>
+              <Link to="feed">{t('guest.viewWall')}</Link>
             </Button>
           </div>
         </div>
