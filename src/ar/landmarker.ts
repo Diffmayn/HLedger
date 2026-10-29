@@ -19,10 +19,15 @@ let instance: Promise<FaceLandmarker> | null = null
 let currentDelegate: 'GPU' | 'CPU' = 'GPU'
 
 async function resolveModelUrl(): Promise<string> {
+  // A self-hosted copy wins, but SPA hosts answer 200 + index.html for missing files,
+  // so verify the zip magic bytes before trusting the local path.
   const local = assetUrl('models/face_landmarker.task')
   try {
-    const head = await fetch(local, { method: 'HEAD' })
-    if (head.ok && (head.headers.get('content-length') ?? '1') !== '0') return local
+    const res = await fetch(local, { headers: { Range: 'bytes=0-3' } })
+    if (res.ok && !(res.headers.get('content-type') ?? '').includes('text/html')) {
+      const head = new Uint8Array(await res.arrayBuffer())
+      if (head[0] === 0x50 && head[1] === 0x4b) return local
+    }
   } catch {
     /* fall through */
   }
