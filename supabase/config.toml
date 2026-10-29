@@ -4,23 +4,32 @@ project_id = "hledger"
 enabled = true
 port = 54321
 schemas = ["public", "storage"]
+max_rows = 1000
 
 [db]
 port = 54322
-major_version = 15
+major_version = 17
 
 [db.seed]
-enabled = true
-sql_paths = ["./seed.sql"]
+enabled = false
 
 [studio]
-enabled = true
-port = 54323
+enabled = false
+
+[inbucket]
+enabled = false
+
+[analytics]
+enabled = false
+
+[edge_runtime]
+enabled = false
 
 [auth]
 enabled = true
 site_url = "http://localhost:3000"
 additional_redirect_urls = ["http://localhost:3000/host", "http://localhost:4173/host"]
+enable_signup = true
 
 [auth.email]
 enable_signup = true

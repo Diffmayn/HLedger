@@ -15,3 +15,4 @@ test-results
 supabase/.temp
 public/models/*.task
 e2e/fixtures/*.y4m
+e2e/screens/

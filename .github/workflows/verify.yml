@@ -1,0 +1,77 @@
+name: Verify (Supabase + Playwright)
+
+on:
+  push:
+    branches: [v2]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: verify
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Start Supabase
+        run: |
+          supabase start -x studio,imgproxy,inbucket,edge-runtime,logflare,vector,mailpit
+          supabase status -o env > .supabase.env
+          cat .supabase.env | sed 's/^/export /' > .supabase.sh
+      - name: Seed demo event
+        run: |
+          source .supabase.sh
+          curl -sf -X POST "$API_URL/auth/v1/admin/users" \
+            -H "apikey: $SERVICE_ROLE_KEY" -H "Authorization: Bearer $SERVICE_ROLE_KEY" \
+            -H "Content-Type: application/json" \
+            -d '{"email":"host@example.com","password":"ci-password-123","email_confirm":true}' > /dev/null
+          psql "$DB_URL" -v ON_ERROR_STOP=1 -f supabase/seed.sql
+
+      - run: npm install --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+
+      - name: Build
+        run: |
+          source .supabase.sh
+          VITE_SUPABASE_URL="$API_URL" VITE_SUPABASE_ANON_KEY="$ANON_KEY" npm run build
+
+      - name: Playwright
+        id: e2e
+        run: |
+          source .supabase.sh
+          mkdir -p e2e/screens
+          VITE_SUPABASE_URL="$API_URL" VITE_SUPABASE_ANON_KEY="$ANON_KEY" \
+            npx playwright test --project=desktop --project=booth --reporter=list,json 2>&1 | tee e2e/screens/playwright.txt
+        continue-on-error: true
+
+      - name: Publish artifacts to ci-artifacts branch
+        if: always()
+        run: |
+          set -e
+          mkdir -p out && cp -r e2e/screens/. out/ 2>/dev/null || true
+          cp package-lock.json out/package-lock.json
+          cp test-results/.last-run.json out/last-run.json 2>/dev/null || true
+          ls -la out
+          cd out
+          git init -q -b ci-artifacts
+          git config user.name "ci"
+          git config user.email "ci@users.noreply.github.com"
+          git add -A
+          git commit -q -m "artifacts from ${GITHUB_SHA::7} (e2e: ${{ steps.e2e.outcome }})"
+          git push -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git" ci-artifacts
+
+      - name: Fail if e2e failed
+        if: steps.e2e.outcome == 'failure'
+        run: exit 1
