@@ -8,7 +8,7 @@ import { prepareImage, prepareVideo } from '@/lib/media'
 import { useT } from '@/i18n'
 import { EmojiPicker } from '@/screens/shared/EmojiPicker'
 import { cn } from '@/lib/utils'
-import { toast } from '@/components/ui/Toast'
+import { toast } from '@/components/ui/toastStore'
 
 type Step = 'name' | 'message' | 'media' | 'done'
 
