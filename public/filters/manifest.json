@@ -1,0 +1,864 @@
+{
+  "version": 1,
+  "filters": [
+    {
+      "id": "bow-tie",
+      "name": "Bow Tie",
+      "category": "accessories",
+      "type": "sprite",
+      "src": "filters/accessories/bow-tie.webp",
+      "thumb": "filters/accessories/bow-tie.thumb.webp",
+      "width": 12,
+      "aspect": 1,
+      "anchor": {
+        "landmark": 152,
+        "offset": [
+          0,
+          -5,
+          -1
+        ]
+      }
+    },
+    {
+      "id": "cat-nose",
+      "name": "Cat Nose",
+      "category": "accessories",
+      "type": "sprite",
+      "src": "filters/accessories/cat-nose.webp",
+      "thumb": "filters/accessories/cat-nose.thumb.webp",
+      "width": 4.5,
+      "aspect": 0.3556,
+      "anchor": {
+        "landmark": 1,
+        "offset": [
+          0,
+          -0.3,
+          0.8
+        ]
+      }
+    },
+    {
+      "id": "dog-nose",
+      "name": "Dog Nose",
+      "category": "accessories",
+      "type": "sprite",
+      "src": "filters/accessories/dog-nose.webp",
+      "thumb": "filters/accessories/dog-nose.thumb.webp",
+      "width": 5,
+      "aspect": 0.6095,
+      "anchor": {
+        "landmark": 1,
+        "offset": [
+          0,
+          -0.3,
+          0.8
+        ]
+      }
+    },
+    {
+      "id": "dog-tongue",
+      "name": "Dog Tongue",
+      "category": "accessories",
+      "type": "sprite",
+      "src": "filters/accessories/dog-tongue.webp",
+      "thumb": "filters/accessories/dog-tongue.thumb.webp",
+      "width": 5,
+      "aspect": 2.1719,
+      "anchor": {
+        "landmark": 14,
+        "offset": [
+          0,
+          -2.2,
+          0.5
+        ]
+      },
+      "trigger": {
+        "blendshape": "jawOpen",
+        "min": 0.45
+      }
+    },
+    {
+      "id": "flower-crown",
+      "name": "Flower Crown",
+      "category": "accessories",
+      "type": "sprite",
+      "src": "filters/accessories/flower-crown.webp",
+      "thumb": "filters/accessories/flower-crown.thumb.webp",
+      "width": 19,
+      "aspect": 0.566,
+      "anchor": {
+        "landmark": 10,
+        "offset": [
+          0,
+          2,
+          -1.5
+        ]
+      }
+    },
+    {
+      "id": "party-horn",
+      "name": "Party Horn",
+      "category": "accessories",
+      "type": "sprite",
+      "src": "filters/accessories/party-horn.webp",
+      "thumb": "filters/accessories/party-horn.thumb.webp",
+      "width": 9,
+      "aspect": 1,
+      "anchor": {
+        "landmark": 13,
+        "offset": [
+          0,
+          -0.6,
+          1.5
+        ]
+      },
+      "trigger": {
+        "blendshape": "jawOpen",
+        "min": 0.4
+      }
+    },
+    {
+      "id": "anime-mask",
+      "name": "Anime Mask",
+      "category": "faces",
+      "type": "sprite",
+      "src": "filters/faces/anime-mask.webp",
+      "thumb": "filters/faces/anime-mask.thumb.webp",
+      "width": 17,
+      "aspect": 1.3605,
+      "anchor": {
+        "landmark": 168,
+        "offset": [
+          0,
+          -1.5,
+          1.5
+        ]
+      }
+    },
+    {
+      "id": "anonymous-mask",
+      "name": "Anonymous Mask",
+      "category": "faces",
+      "type": "sprite",
+      "src": "filters/faces/anonymous-mask.webp",
+      "thumb": "filters/faces/anonymous-mask.thumb.webp",
+      "width": 17,
+      "aspect": 1.3635,
+      "anchor": {
+        "landmark": 168,
+        "offset": [
+          0,
+          -1.5,
+          1.5
+        ]
+      }
+    },
+    {
+      "id": "jason-joker-mask",
+      "name": "Jason Joker Mask",
+      "category": "faces",
+      "type": "sprite",
+      "src": "filters/faces/jason-joker-mask.webp",
+      "thumb": "filters/faces/jason-joker-mask.thumb.webp",
+      "width": 17,
+      "aspect": 1.5228,
+      "anchor": {
+        "landmark": 168,
+        "offset": [
+          0,
+          -1.5,
+          1.5
+        ]
+      }
+    },
+    {
+      "id": "mask",
+      "name": "Mask",
+      "category": "faces",
+      "type": "sprite",
+      "src": "filters/faces/mask.webp",
+      "thumb": "filters/faces/mask.thumb.webp",
+      "width": 17,
+      "aspect": 0.7299,
+      "anchor": {
+        "landmark": 168,
+        "offset": [
+          0,
+          -1.5,
+          1.5
+        ]
+      }
+    },
+    {
+      "id": "squid-front-man-mask",
+      "name": "Squid Front Man Mask",
+      "category": "faces",
+      "type": "sprite",
+      "src": "filters/faces/squid-front-man-mask.webp",
+      "thumb": "filters/faces/squid-front-man-mask.thumb.webp",
+      "width": 17,
+      "aspect": 1.3318,
+      "anchor": {
+        "landmark": 168,
+        "offset": [
+          0,
+          -1.5,
+          1.5
+        ]
+      }
+    },
+    {
+      "id": "squid-guard-mask",
+      "name": "Squid Guard Mask",
+      "category": "faces",
+      "type": "sprite",
+      "src": "filters/faces/squid-guard-mask.webp",
+      "thumb": "filters/faces/squid-guard-mask.thumb.webp",
+      "width": 17,
+      "aspect": 1.3657,
+      "anchor": {
+        "landmark": 168,
+        "offset": [
+          0,
+          -1.5,
+          1.5
+        ]
+      }
+    },
+    {
+      "id": "aviator",
+      "name": "Aviator",
+      "category": "glasses",
+      "type": "sprite",
+      "src": "filters/glasses/aviator.webp",
+      "thumb": "filters/glasses/aviator.thumb.webp",
+      "width": 14.5,
+      "aspect": 1,
+      "anchor": {
+        "landmark": 168,
+        "offset": [
+          0,
+          0.3,
+          1.5
+        ]
+      }
+    },
+    {
+      "id": "banana-glasses",
+      "name": "Banana Glasses",
+      "category": "glasses",
+      "type": "sprite",
+      "src": "filters/glasses/banana-glasses.webp",
+      "thumb": "filters/glasses/banana-glasses.thumb.webp",
+      "width": 14.5,
+      "aspect": 0.667,
+      "anchor": {
+        "landmark": 168,
+        "offset": [
+          0,
+          0.3,
+          1.5
+        ]
+      }
+    },
+    {
+      "id": "cat-eye",
+      "name": "Cat Eye",
+      "category": "glasses",
+      "type": "sprite",
+      "src": "filters/glasses/cat-eye.webp",
+      "thumb": "filters/glasses/cat-eye.thumb.webp",
+      "width": 14.5,
+      "aspect": 1,
+      "anchor": {
+        "landmark": 168,
+        "offset": [
+          0,
+          0.3,
+          1.5
+        ]
+      }
+    },
+    {
+      "id": "classic-glasses",
+      "name": "Classic Glasses",
+      "category": "glasses",
+      "type": "sprite",
+      "src": "filters/glasses/classic-glasses.webp",
+      "thumb": "filters/glasses/classic-glasses.thumb.webp",
+      "width": 14.5,
+      "aspect": 0.3389,
+      "anchor": {
+        "landmark": 168,
+        "offset": [
+          0,
+          0.3,
+          1.5
+        ]
+      }
+    },
+    {
+      "id": "heart-glasses",
+      "name": "Heart Glasses",
+      "category": "glasses",
+      "type": "sprite",
+      "src": "filters/glasses/heart-glasses.webp",
+      "thumb": "filters/glasses/heart-glasses.thumb.webp",
+      "width": 14.5,
+      "aspect": 1,
+      "anchor": {
+        "landmark": 168,
+        "offset": [
+          0,
+          0.3,
+          1.5
+        ]
+      }
+    },
+    {
+      "id": "neon",
+      "name": "Neon",
+      "category": "glasses",
+      "type": "sprite",
+      "src": "filters/glasses/neon.webp",
+      "thumb": "filters/glasses/neon.thumb.webp",
+      "width": 14.5,
+      "aspect": 1,
+      "anchor": {
+        "landmark": 168,
+        "offset": [
+          0,
+          0.3,
+          1.5
+        ]
+      }
+    },
+    {
+      "id": "nerd-glasses",
+      "name": "Nerd Glasses",
+      "category": "glasses",
+      "type": "sprite",
+      "src": "filters/glasses/nerd-glasses.webp",
+      "thumb": "filters/glasses/nerd-glasses.thumb.webp",
+      "width": 14.5,
+      "aspect": 1,
+      "anchor": {
+        "landmark": 168,
+        "offset": [
+          0,
+          0.3,
+          1.5
+        ]
+      }
+    },
+    {
+      "id": "pixel-glasses",
+      "name": "Pixel Glasses",
+      "category": "glasses",
+      "type": "sprite",
+      "src": "filters/glasses/pixel-glasses.webp",
+      "thumb": "filters/glasses/pixel-glasses.thumb.webp",
+      "width": 14.5,
+      "aspect": 1,
+      "anchor": {
+        "landmark": 168,
+        "offset": [
+          0,
+          0.3,
+          1.5
+        ]
+      }
+    },
+    {
+      "id": "star-glasses",
+      "name": "Star Glasses",
+      "category": "glasses",
+      "type": "sprite",
+      "src": "filters/glasses/star-glasses.webp",
+      "thumb": "filters/glasses/star-glasses.thumb.webp",
+      "width": 14.5,
+      "aspect": 1,
+      "anchor": {
+        "landmark": 168,
+        "offset": [
+          0,
+          0.3,
+          1.5
+        ]
+      }
+    },
+    {
+      "id": "steampunk",
+      "name": "Steampunk",
+      "category": "glasses",
+      "type": "sprite",
+      "src": "filters/glasses/steampunk.webp",
+      "thumb": "filters/glasses/steampunk.thumb.webp",
+      "width": 14.5,
+      "aspect": 1,
+      "anchor": {
+        "landmark": 168,
+        "offset": [
+          0,
+          0.3,
+          1.5
+        ]
+      }
+    },
+    {
+      "id": "banana-hat",
+      "name": "Banana Hat",
+      "category": "hats",
+      "type": "sprite",
+      "src": "filters/hats/banana-hat.webp",
+      "thumb": "filters/hats/banana-hat.thumb.webp",
+      "width": 16,
+      "aspect": 0.667,
+      "anchor": {
+        "landmark": 10,
+        "offset": [
+          0,
+          5,
+          -2
+        ]
+      }
+    },
+    {
+      "id": "beret",
+      "name": "Beret",
+      "category": "hats",
+      "type": "sprite",
+      "src": "filters/hats/beret.webp",
+      "thumb": "filters/hats/beret.thumb.webp",
+      "width": 19,
+      "aspect": 1,
+      "anchor": {
+        "landmark": 10,
+        "offset": [
+          0,
+          4,
+          -2.5
+        ]
+      }
+    },
+    {
+      "id": "birthday-hat",
+      "name": "Birthday Hat",
+      "category": "hats",
+      "type": "sprite",
+      "src": "filters/hats/birthday-hat.webp",
+      "thumb": "filters/hats/birthday-hat.thumb.webp",
+      "width": 14,
+      "aspect": 1,
+      "anchor": {
+        "landmark": 10,
+        "offset": [
+          0,
+          7,
+          -2
+        ]
+      }
+    },
+    {
+      "id": "cat-ears",
+      "name": "Cat Ears",
+      "category": "hats",
+      "type": "sprite",
+      "src": "filters/hats/cat-ears.webp",
+      "thumb": "filters/hats/cat-ears.thumb.webp",
+      "width": 20,
+      "aspect": 0.4007,
+      "anchor": {
+        "landmark": 10,
+        "offset": [
+          0,
+          3,
+          -3
+        ]
+      }
+    },
+    {
+      "id": "cowboy-hat",
+      "name": "Cowboy Hat",
+      "category": "hats",
+      "type": "sprite",
+      "src": "filters/hats/cowboy-hat.webp",
+      "thumb": "filters/hats/cowboy-hat.thumb.webp",
+      "width": 22,
+      "aspect": 1,
+      "anchor": {
+        "landmark": 10,
+        "offset": [
+          0,
+          4,
+          -2
+        ]
+      }
+    },
+    {
+      "id": "crown",
+      "name": "Crown",
+      "category": "hats",
+      "type": "sprite",
+      "src": "filters/hats/crown.webp",
+      "thumb": "filters/hats/crown.thumb.webp",
+      "width": 16,
+      "aspect": 1,
+      "anchor": {
+        "landmark": 10,
+        "offset": [
+          0,
+          5,
+          -2
+        ]
+      }
+    },
+    {
+      "id": "dog-ears",
+      "name": "Dog Ears",
+      "category": "hats",
+      "type": "sprite",
+      "src": "filters/hats/dog-ears.webp",
+      "thumb": "filters/hats/dog-ears.thumb.webp",
+      "width": 22,
+      "aspect": 0.3883,
+      "anchor": {
+        "landmark": 10,
+        "offset": [
+          0,
+          2.5,
+          -3
+        ]
+      }
+    },
+    {
+      "id": "gold-crown",
+      "name": "Gold Crown",
+      "category": "hats",
+      "type": "sprite",
+      "src": "filters/hats/gold-crown.webp",
+      "thumb": "filters/hats/gold-crown.thumb.webp",
+      "width": 16,
+      "aspect": 0.8083,
+      "anchor": {
+        "landmark": 10,
+        "offset": [
+          0,
+          5,
+          -2
+        ]
+      }
+    },
+    {
+      "id": "green-carnival",
+      "name": "Green Carnival",
+      "category": "hats",
+      "type": "sprite",
+      "src": "filters/hats/green-carnival.webp",
+      "thumb": "filters/hats/green-carnival.thumb.webp",
+      "width": 20,
+      "aspect": 0.435,
+      "anchor": {
+        "landmark": 10,
+        "offset": [
+          0,
+          3,
+          -1
+        ]
+      }
+    },
+    {
+      "id": "monkey-ears",
+      "name": "Monkey Ears",
+      "category": "hats",
+      "type": "sprite",
+      "src": "filters/hats/monkey-ears.webp",
+      "thumb": "filters/hats/monkey-ears.thumb.webp",
+      "width": 24,
+      "aspect": 1,
+      "anchor": {
+        "landmark": 168,
+        "offset": [
+          0,
+          1,
+          -4
+        ]
+      }
+    },
+    {
+      "id": "party-hat",
+      "name": "Party Hat",
+      "category": "hats",
+      "type": "sprite",
+      "src": "filters/hats/party-hat.webp",
+      "thumb": "filters/hats/party-hat.thumb.webp",
+      "width": 14,
+      "aspect": 1,
+      "anchor": {
+        "landmark": 10,
+        "offset": [
+          0,
+          7,
+          -2
+        ]
+      }
+    },
+    {
+      "id": "top-hat",
+      "name": "Top Hat",
+      "category": "hats",
+      "type": "sprite",
+      "src": "filters/hats/top-hat.webp",
+      "thumb": "filters/hats/top-hat.thumb.webp",
+      "width": 18,
+      "aspect": 1,
+      "anchor": {
+        "landmark": 10,
+        "offset": [
+          0,
+          6,
+          -2.5
+        ]
+      }
+    },
+    {
+      "id": "visor",
+      "name": "Visor",
+      "category": "hats",
+      "type": "sprite",
+      "src": "filters/hats/visor.webp",
+      "thumb": "filters/hats/visor.thumb.webp",
+      "width": 20,
+      "aspect": 1,
+      "anchor": {
+        "landmark": 10,
+        "offset": [
+          0,
+          2,
+          0
+        ]
+      }
+    },
+    {
+      "id": "wizard-hat",
+      "name": "Wizard Hat",
+      "category": "hats",
+      "type": "sprite",
+      "src": "filters/hats/wizard-hat.webp",
+      "thumb": "filters/hats/wizard-hat.thumb.webp",
+      "width": 16,
+      "aspect": 1,
+      "anchor": {
+        "landmark": 10,
+        "offset": [
+          0,
+          8,
+          -2
+        ]
+      }
+    },
+    {
+      "id": "banana-moustache",
+      "name": "Banana Moustache",
+      "category": "moustaches",
+      "type": "sprite",
+      "src": "filters/moustaches/banana-moustache.webp",
+      "thumb": "filters/moustaches/banana-moustache.thumb.webp",
+      "width": 7,
+      "aspect": 0.667,
+      "anchor": {
+        "landmark": 164,
+        "offset": [
+          0,
+          0.2,
+          1
+        ]
+      }
+    },
+    {
+      "id": "classic-mustache",
+      "name": "Classic Mustache",
+      "category": "moustaches",
+      "type": "sprite",
+      "src": "filters/moustaches/classic-mustache.webp",
+      "thumb": "filters/moustaches/classic-mustache.thumb.webp",
+      "width": 7,
+      "aspect": 0.2725,
+      "anchor": {
+        "landmark": 164,
+        "offset": [
+          0,
+          0.2,
+          1
+        ]
+      }
+    },
+    {
+      "id": "curly",
+      "name": "Curly",
+      "category": "moustaches",
+      "type": "sprite",
+      "src": "filters/moustaches/curly.webp",
+      "thumb": "filters/moustaches/curly.thumb.webp",
+      "width": 7,
+      "aspect": 1,
+      "anchor": {
+        "landmark": 164,
+        "offset": [
+          0,
+          0.2,
+          1
+        ]
+      }
+    },
+    {
+      "id": "full-beard",
+      "name": "Full Beard",
+      "category": "moustaches",
+      "type": "sprite",
+      "src": "filters/moustaches/full-beard.webp",
+      "thumb": "filters/moustaches/full-beard.thumb.webp",
+      "width": 14,
+      "aspect": 1,
+      "anchor": {
+        "landmark": 17,
+        "offset": [
+          0,
+          -1.5,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "goatee",
+      "name": "Goatee",
+      "category": "moustaches",
+      "type": "sprite",
+      "src": "filters/moustaches/goatee.webp",
+      "thumb": "filters/moustaches/goatee.thumb.webp",
+      "width": 6,
+      "aspect": 1,
+      "anchor": {
+        "landmark": 152,
+        "offset": [
+          0,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "id": "handlebar",
+      "name": "Handlebar",
+      "category": "moustaches",
+      "type": "sprite",
+      "src": "filters/moustaches/handlebar.webp",
+      "thumb": "filters/moustaches/handlebar.thumb.webp",
+      "width": 7,
+      "aspect": 1,
+      "anchor": {
+        "landmark": 164,
+        "offset": [
+          0,
+          0.2,
+          1
+        ]
+      }
+    },
+    {
+      "id": "pencil",
+      "name": "Pencil",
+      "category": "moustaches",
+      "type": "sprite",
+      "src": "filters/moustaches/pencil.webp",
+      "thumb": "filters/moustaches/pencil.thumb.webp",
+      "width": 7,
+      "aspect": 1,
+      "anchor": {
+        "landmark": 164,
+        "offset": [
+          0,
+          0.2,
+          1
+        ]
+      }
+    },
+    {
+      "id": "stubble",
+      "name": "Stubble",
+      "category": "moustaches",
+      "type": "sprite",
+      "src": "filters/moustaches/stubble.webp",
+      "thumb": "filters/moustaches/stubble.thumb.webp",
+      "width": 13,
+      "aspect": 1,
+      "anchor": {
+        "landmark": 164,
+        "offset": [
+          0,
+          -2,
+          0.5
+        ]
+      }
+    },
+    {
+      "id": "walrus",
+      "name": "Walrus",
+      "category": "moustaches",
+      "type": "sprite",
+      "src": "filters/moustaches/walrus.webp",
+      "thumb": "filters/moustaches/walrus.thumb.webp",
+      "width": 7,
+      "aspect": 1,
+      "anchor": {
+        "landmark": 164,
+        "offset": [
+          0,
+          0.2,
+          1
+        ]
+      }
+    },
+    {
+      "id": "mask-anime",
+      "name": "Anime",
+      "category": "masks",
+      "type": "mesh",
+      "src": "filters/masks/anime.webp",
+      "thumb": "filters/masks/anime.thumb.webp",
+      "points": "filters/masks/anime.json",
+      "aspect": 1.3605
+    },
+    {
+      "id": "mask-anonymous",
+      "name": "Anonymous",
+      "category": "masks",
+      "type": "mesh",
+      "src": "filters/masks/anonymous.webp",
+      "thumb": "filters/masks/anonymous.thumb.webp",
+      "points": "filters/masks/anonymous.json",
+      "aspect": 1.3635
+    },
+    {
+      "id": "mask-green-carnival",
+      "name": "Green Carnival",
+      "category": "masks",
+      "type": "mesh",
+      "src": "filters/masks/green-carnival.webp",
+      "thumb": "filters/masks/green-carnival.thumb.webp",
+      "points": "filters/masks/green-carnival.json",
+      "aspect": 0.435,
+      "partial": true
+    },
+    {
+      "id": "mask-jason-joker",
+      "name": "Jason Joker",
+      "category": "masks",
+      "type": "mesh",
+      "src": "filters/masks/jason-joker.webp",
+      "thumb": "filters/masks/jason-joker.thumb.webp",
+      "points": "filters/masks/jason-joker.json",
+      "aspect": 1.5228
+    }
+  ]
+}
