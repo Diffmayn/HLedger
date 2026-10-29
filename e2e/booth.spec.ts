@@ -28,11 +28,34 @@ test('booth renders camera, filters and takes a photo', async ({ page }) => {
 })
 
 
-test('booth detects a face and applies a sprite', async ({ page }) => {
+test('booth detects a face and places filters', async ({ page }) => {
   test.skip(!fs.existsSync('e2e/fixtures/face.y4m'), 'needs e2e/fixtures/face.y4m')
   await page.goto('/demo/booth')
   await expect(page.getByRole('button', { name: /tap to start/i })).toBeEnabled({ timeout: 20_000 })
-  await page.getByRole('option', { name: /top hat/i }).click()
-  await expect(page.getByText(/step into the frame/i)).toBeHidden({ timeout: 10_000 })
-  await page.screenshot({ path: `${shots}/booth-face.png` })
+  await expect(page.getByText(/loading face filters/i)).toBeHidden({ timeout: 60_000 })
+  const tries: { category: string; option: RegExp; name: string }[] = [
+    { category: 'Hats', option: /^top hat$/i, name: 'top-hat' },
+    { category: 'Glasses', option: /^aviator$/i, name: 'aviator' },
+    { category: 'Moustaches', option: /^handlebar$/i, name: 'handlebar' },
+    { category: 'Accessories', option: /^dog nose$/i, name: 'dog-nose' },
+    { category: 'Masks', option: /^anonymous$/i, name: 'mask-anonymous' },
+    { category: 'Faces', option: /squid guard/i, name: 'squid-guard' },
+  ]
+  for (const t of tries) {
+    await page.getByRole('button', { name: new RegExp(`^${t.category}$`, 'i') }).click()
+    await page.getByRole('option', { name: t.option }).click()
+    await page.waitForTimeout(1200)
+    await expect(page.getByText(/step into the frame/i)).toBeHidden()
+    await page.screenshot({ path: `${shots}/booth-face-${t.name}.png` })
+  }
+  // All slots at once.
+  await page.getByRole('button', { name: /^no filter$/i }).click()
+  for (const t of tries.slice(0, 4)) {
+    await page.getByRole('button', { name: new RegExp(`^${t.category}$`, 'i') }).click()
+    await page.getByRole('option', { name: t.option }).click()
+  }
+  await page.waitForTimeout(1200)
+  await page.screenshot({ path: `${shots}/booth-face-combo.png` })
+  const fps = await page.locator('text=/\\d+ fps/').textContent().catch(() => null)
+  if (fps) fs.appendFileSync(`${shots}/console.txt`, `fps: ${fps}\n`)
 })
