@@ -5,6 +5,12 @@ on:
     branches: [main]
   workflow_dispatch:
 
+# Publishable (browser) values for the hosted Supabase project. Not secrets:
+# they ship in the JS bundle. RLS in supabase/migrations protects the data.
+env:
+  VITE_SUPABASE_URL: https://vxbblrywoijetbzyzdgd.supabase.co
+  VITE_SUPABASE_ANON_KEY: sb_publishable_YqaSQW3px-_mi6hTnupPlg_kEimUcFj
+
 permissions:
   contents: read
   pages: write
@@ -23,10 +29,19 @@ jobs:
         with:
           node-version-file: .nvmrc
       - run: npm ci
+      - name: Check the Supabase schema is applied
+        run: |
+          code=$(curl -s -o body.json -w '%{http_code}' "$VITE_SUPABASE_URL/rest/v1/events?select=id&limit=1" \
+            -H "apikey: $VITE_SUPABASE_ANON_KEY" -H "Authorization: Bearer $VITE_SUPABASE_ANON_KEY")
+          echo "events table -> HTTP $code"; cat body.json; echo
+          if [ "$code" != "200" ]; then
+            echo "::error::Supabase schema not found. Run supabase/migrations/20261029100000_init.sql in the SQL editor."
+            exit 1
+          fi
+          code=$(curl -s -o /dev/null -w '%{http_code}' "$VITE_SUPABASE_URL/storage/v1/bucket/media" \
+            -H "apikey: $VITE_SUPABASE_ANON_KEY" -H "Authorization: Bearer $VITE_SUPABASE_ANON_KEY")
+          echo "media bucket -> HTTP $code"
       - run: npm run build
-        env:
-          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
-          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
       - run: cp dist/index.html dist/404.html
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
