@@ -97,6 +97,7 @@ test('host signs in, moderates, edits speech and sees links', async ({ page }) =
   await expect(page.getByRole('button', { name: /restore/i })).toHaveCount(0, { timeout: 10_000 })
 
   // Delete the photo entry (row + Storage files).
+  await page.getByRole('button', { name: /^published/i }).click()
   page.once('dialog', (d) => void d.accept())
   const photoCard = page.locator('li', { hasText: 'Photo Guest' })
   await photoCard.getByRole('button', { name: /delete/i }).click()
