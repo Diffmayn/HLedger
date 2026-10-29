@@ -2,6 +2,10 @@
 
 As of 2026-10-29. Companion doc (with diagram): https://claude.ai/artifact/F7xArR5WTk6kHKwtuQF4PA
 
+## Status
+
+Phases 1–8 are implemented on `v2`; export (9) is built with CSV verified end to end; hardening (10) is partly done (PWA shell, outbox) and partly open (offline retry test, reduced-motion audit). Two workflows gate the branch: **CI** (lint, typecheck, unit tests, build) and **Verify** (real local Supabase + migration + seed + Playwright flows on every screen, fake camera fed by `e2e/fixtures/face.jpg`; screenshots land on the `ci-artifacts` branch). Run Verify manually with the "face" input to exercise filter placement.
+
 ## Verdict: rebuild from the ground up, salvage the assets and the domain logic
 
 Rebuild. The two things wanted most — a new UI/UX everywhere and working AR filters — touch every file, and the AR filter feature did not exist in the old app: `main` had no face-tracking code, only 46 MB of filter PNGs and MediaPipe WASM sitting unused in `public/`, a copied LearnOpenCV Python repo, and a build script pointing at a `src/components/FaceFilter/filterData.js` that was never committed. The data layer also had to change shape: photos and videos were stored as base64 strings in Postgres `text` columns, every realtime event refetched the whole table on every client, and every hook carried two code paths (Dexie vs Supabase).

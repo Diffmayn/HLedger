@@ -7,6 +7,7 @@ One deployment serves many events; each event lives at `/{slug}`.
 | Screen | URL | Device |
 | --- | --- | --- |
 | Guest posting | `/{slug}` | Guests' phones (QR code) |
+| Guest feed + reactions | `/{slug}/feed` | Guests' phones |
 | Live wall | `/{slug}/wall` | TV or projector |
 | Photo booth | `/{slug}/booth` | iPad / laptop, fullscreen |
 | Host admin | `/{slug}/host`, `/host` | Host laptop, signed in |
