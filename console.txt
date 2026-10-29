@@ -1,0 +1,9 @@
+[booth renders camera, filters and takes a photo] warning: [.WebGL-0xeac001d2e00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels
+[booth renders camera, filters and takes a photo] warning: W1029 18:43:12.447000 2136208 face_landmarker_graph.cc:180] Sets FaceBlendshapesGraph acceleration to xnnpack by default.
+[booth renders camera, filters and takes a photo] warning: W1029 18:43:12.510000 2136208 gl_context.cc:1118] OpenGL error checking is disabled
+[booth renders camera, filters and takes a photo] error: INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
+[booth renders camera, filters and takes a photo] warning: [.WebGL-0xeac03025c00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels
+[booth renders camera, filters and takes a photo] warning: [.WebGL-0xeac03025c00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels
+[booth renders camera, filters and takes a photo] warning: [.WebGL-0xeac03025c00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat)
+[booth renders camera, filters and takes a photo] warning: WebGL: INVALID_OPERATION: texImage3D: FLIP_Y or PREMULTIPLY_ALPHA isn't allowed for uploading 3D textures
+[booth renders camera, filters and takes a photo] warning: WebGL: INVALID_OPERATION: texImage3D: FLIP_Y or PREMULTIPLY_ALPHA isn't allowed for uploading 3D textures

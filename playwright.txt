@@ -1,0 +1,662 @@
+
+Running 8 tests using 2 workers
+
+  ✓  1 [desktop] › e2e/smoke.spec.ts:5:1 › app boots (492ms)
+  ✓  3 [desktop] › e2e/smoke.spec.ts:12:1 › unknown event shows not-found or not-configured (431ms)
+  ✓  2 [desktop] › e2e/flows.spec.ts:17:1 › guest posts a message and the wall shows it (6.9s)
+  ✓  5 [desktop] › e2e/flows.spec.ts:53:1 › guest posts a photo (1.6s)
+  ✓  6 [desktop] › e2e/flows.spec.ts:70:1 › host screen asks for sign-in (934ms)
+  ✓  7 [desktop] › e2e/flows.spec.ts:77:1 › host signs in, moderates, edits speech and sees links (3.3s)
+  ✓  4 [booth] › e2e/booth.spec.ts:16:1 › booth renders camera, filters and takes a photo (14.4s)
+  -  8 [booth] › e2e/booth.spec.ts:32:1 › booth detects a face and places filters
+
+  1 skipped
+  7 passed (17.4s)
+{
+  "config": {
+    "argv": [
+      "/opt/hostedtoolcache/node/22.23.4/x64/bin/node",
+      "/home/runner/work/HLedger/HLedger/node_modules/.bin/playwright",
+      "test",
+      "--project=desktop",
+      "--project=booth",
+      "--reporter=list,json"
+    ],
+    "configFile": "/home/runner/work/HLedger/HLedger/playwright.config.ts",
+    "rootDir": "/home/runner/work/HLedger/HLedger/e2e",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "ci": {
+        "commitHref": "https://github.com/Diffmayn/HLedger/commit/c01b0e378d8c8235e13df52268e533dd933e87f3",
+        "commitHash": "c01b0e378d8c8235e13df52268e533dd933e87f3",
+        "buildHref": "https://github.com/Diffmayn/HLedger/actions/runs/40932901031"
+      },
+      "gitCommit": {
+        "shortHash": "c01b0e3",
+        "hash": "c01b0e378d8c8235e13df52268e533dd933e87f3",
+        "subject": "deploy: hosted Supabase project (publishable values) + schema check before build",
+        "body": "deploy: hosted Supabase project (publishable values) + schema check before build\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01DZXWbWrG3ZM9PN7vgDzJ4h\n",
+        "author": {
+          "name": "René Krogsgaard Hansen",
+          "email": "rene.krogsgaard.hansen@sallinggroup.com",
+          "time": 1793299176000
+        },
+        "committer": {
+          "name": "René Krogsgaard Hansen",
+          "email": "rene.krogsgaard.hansen@sallinggroup.com",
+          "time": 1793299176000
+        },
+        "branch": "v2"
+      },
+      "actualWorkers": 2
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/home/runner/work/HLedger/HLedger/test-results",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "ci": {
+            "commitHref": "https://github.com/Diffmayn/HLedger/commit/c01b0e378d8c8235e13df52268e533dd933e87f3",
+            "commitHash": "c01b0e378d8c8235e13df52268e533dd933e87f3",
+            "buildHref": "https://github.com/Diffmayn/HLedger/actions/runs/40932901031"
+          },
+          "gitCommit": {
+            "shortHash": "c01b0e3",
+            "hash": "c01b0e378d8c8235e13df52268e533dd933e87f3",
+            "subject": "deploy: hosted Supabase project (publishable values) + schema check before build",
+            "body": "deploy: hosted Supabase project (publishable values) + schema check before build\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01DZXWbWrG3ZM9PN7vgDzJ4h\n",
+            "author": {
+              "name": "René Krogsgaard Hansen",
+              "email": "rene.krogsgaard.hansen@sallinggroup.com",
+              "time": 1793299176000
+            },
+            "committer": {
+              "name": "René Krogsgaard Hansen",
+              "email": "rene.krogsgaard.hansen@sallinggroup.com",
+              "time": 1793299176000
+            },
+            "branch": "v2"
+          },
+          "actualWorkers": 2
+        },
+        "id": "desktop",
+        "name": "desktop",
+        "testDir": "/home/runner/work/HLedger/HLedger/e2e",
+        "testIgnore": [
+          "/booth\\.spec\\.ts/"
+        ],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "/home/runner/work/HLedger/HLedger/test-results",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "ci": {
+            "commitHref": "https://github.com/Diffmayn/HLedger/commit/c01b0e378d8c8235e13df52268e533dd933e87f3",
+            "commitHash": "c01b0e378d8c8235e13df52268e533dd933e87f3",
+            "buildHref": "https://github.com/Diffmayn/HLedger/actions/runs/40932901031"
+          },
+          "gitCommit": {
+            "shortHash": "c01b0e3",
+            "hash": "c01b0e378d8c8235e13df52268e533dd933e87f3",
+            "subject": "deploy: hosted Supabase project (publishable values) + schema check before build",
+            "body": "deploy: hosted Supabase project (publishable values) + schema check before build\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01DZXWbWrG3ZM9PN7vgDzJ4h\n",
+            "author": {
+              "name": "René Krogsgaard Hansen",
+              "email": "rene.krogsgaard.hansen@sallinggroup.com",
+              "time": 1793299176000
+            },
+            "committer": {
+              "name": "René Krogsgaard Hansen",
+              "email": "rene.krogsgaard.hansen@sallinggroup.com",
+              "time": 1793299176000
+            },
+            "branch": "v2"
+          },
+          "actualWorkers": 2
+        },
+        "id": "mobile",
+        "name": "mobile",
+        "testDir": "/home/runner/work/HLedger/HLedger/e2e",
+        "testIgnore": [
+          "/booth\\.spec\\.ts/"
+        ],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "/home/runner/work/HLedger/HLedger/test-results",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "ci": {
+            "commitHref": "https://github.com/Diffmayn/HLedger/commit/c01b0e378d8c8235e13df52268e533dd933e87f3",
+            "commitHash": "c01b0e378d8c8235e13df52268e533dd933e87f3",
+            "buildHref": "https://github.com/Diffmayn/HLedger/actions/runs/40932901031"
+          },
+          "gitCommit": {
+            "shortHash": "c01b0e3",
+            "hash": "c01b0e378d8c8235e13df52268e533dd933e87f3",
+            "subject": "deploy: hosted Supabase project (publishable values) + schema check before build",
+            "body": "deploy: hosted Supabase project (publishable values) + schema check before build\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01DZXWbWrG3ZM9PN7vgDzJ4h\n",
+            "author": {
+              "name": "René Krogsgaard Hansen",
+              "email": "rene.krogsgaard.hansen@sallinggroup.com",
+              "time": 1793299176000
+            },
+            "committer": {
+              "name": "René Krogsgaard Hansen",
+              "email": "rene.krogsgaard.hansen@sallinggroup.com",
+              "time": 1793299176000
+            },
+            "branch": "v2"
+          },
+          "actualWorkers": 2
+        },
+        "id": "booth",
+        "name": "booth",
+        "testDir": "/home/runner/work/HLedger/HLedger/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "/booth\\.spec\\.ts/"
+        ],
+        "timeout": 60000
+      }
+    ],
+    "filteredProjects": [
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "/home/runner/work/HLedger/HLedger/test-results",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "ci": {
+            "commitHref": "https://github.com/Diffmayn/HLedger/commit/c01b0e378d8c8235e13df52268e533dd933e87f3",
+            "commitHash": "c01b0e378d8c8235e13df52268e533dd933e87f3",
+            "buildHref": "https://github.com/Diffmayn/HLedger/actions/runs/40932901031"
+          },
+          "gitCommit": {
+            "shortHash": "c01b0e3",
+            "hash": "c01b0e378d8c8235e13df52268e533dd933e87f3",
+            "subject": "deploy: hosted Supabase project (publishable values) + schema check before build",
+            "body": "deploy: hosted Supabase project (publishable values) + schema check before build\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01DZXWbWrG3ZM9PN7vgDzJ4h\n",
+            "author": {
+              "name": "René Krogsgaard Hansen",
+              "email": "rene.krogsgaard.hansen@sallinggroup.com",
+              "time": 1793299176000
+            },
+            "committer": {
+              "name": "René Krogsgaard Hansen",
+              "email": "rene.krogsgaard.hansen@sallinggroup.com",
+              "time": 1793299176000
+            },
+            "branch": "v2"
+          },
+          "actualWorkers": 2
+        },
+        "name": "desktop",
+        "testDir": "/home/runner/work/HLedger/HLedger/e2e",
+        "snapshotDir": "/home/runner/work/HLedger/HLedger/e2e",
+        "testIgnore": {},
+        "testMatch": "**/*.@(spec|test).?(c|m)[jt]s?(x)",
+        "timeout": 60000,
+        "use": {
+          "baseURL": "http://localhost:4173",
+          "trace": "retain-on-failure",
+          "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Safari/537.36",
+          "viewport": {
+            "width": 1280,
+            "height": 720
+          },
+          "screen": {
+            "width": 1920,
+            "height": 1080
+          },
+          "deviceScaleFactor": 1,
+          "isMobile": false,
+          "hasTouch": false,
+          "defaultBrowserType": "chromium"
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": "desktop"
+      },
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "/home/runner/work/HLedger/HLedger/test-results",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "ci": {
+            "commitHref": "https://github.com/Diffmayn/HLedger/commit/c01b0e378d8c8235e13df52268e533dd933e87f3",
+            "commitHash": "c01b0e378d8c8235e13df52268e533dd933e87f3",
+            "buildHref": "https://github.com/Diffmayn/HLedger/actions/runs/40932901031"
+          },
+          "gitCommit": {
+            "shortHash": "c01b0e3",
+            "hash": "c01b0e378d8c8235e13df52268e533dd933e87f3",
+            "subject": "deploy: hosted Supabase project (publishable values) + schema check before build",
+            "body": "deploy: hosted Supabase project (publishable values) + schema check before build\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01DZXWbWrG3ZM9PN7vgDzJ4h\n",
+            "author": {
+              "name": "René Krogsgaard Hansen",
+              "email": "rene.krogsgaard.hansen@sallinggroup.com",
+              "time": 1793299176000
+            },
+            "committer": {
+              "name": "René Krogsgaard Hansen",
+              "email": "rene.krogsgaard.hansen@sallinggroup.com",
+              "time": 1793299176000
+            },
+            "branch": "v2"
+          },
+          "actualWorkers": 2
+        },
+        "name": "booth",
+        "testDir": "/home/runner/work/HLedger/HLedger/e2e",
+        "snapshotDir": "/home/runner/work/HLedger/HLedger/e2e",
+        "testIgnore": [],
+        "testMatch": {},
+        "timeout": 60000,
+        "use": {
+          "baseURL": "http://localhost:4173",
+          "trace": "retain-on-failure",
+          "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Safari/537.36",
+          "viewport": {
+            "width": 1280,
+            "height": 720
+          },
+          "screen": {
+            "width": 1920,
+            "height": 1080
+          },
+          "deviceScaleFactor": 1,
+          "isMobile": false,
+          "hasTouch": false,
+          "defaultBrowserType": "chromium",
+          "launchOptions": {
+            "args": [
+              "--use-fake-ui-for-media-stream",
+              "--use-fake-device-for-media-stream",
+              "--use-file-for-fake-video-capture=e2e/fixtures/face.y4m"
+            ]
+          },
+          "permissions": [
+            "camera"
+          ]
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": "booth"
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list"
+      ],
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "default",
+    "updateSourceMethod": "patch",
+    "version": "1.64.1",
+    "workers": 2,
+    "webServer": {
+      "command": "npm run preview -- --port 4173 --strictPort",
+      "url": "http://localhost:4173",
+      "reuseExistingServer": false
+    }
+  },
+  "suites": [
+    {
+      "title": "flows.spec.ts",
+      "file": "flows.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "guest posts a message and the wall shows it",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 6945,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-29T18:43:09.319Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "86d6a544053f1eb9f224-42dc17b40696776f90a9",
+          "file": "flows.spec.ts",
+          "line": 17,
+          "column": 1
+        },
+        {
+          "title": "guest posts a photo",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1612,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-29T18:43:16.548Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "86d6a544053f1eb9f224-799e059fe9c6a79a8ab9",
+          "file": "flows.spec.ts",
+          "line": 53,
+          "column": 1
+        },
+        {
+          "title": "host screen asks for sign-in",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 934,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-29T18:43:18.184Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "86d6a544053f1eb9f224-7bc79f82a917234048bc",
+          "file": "flows.spec.ts",
+          "line": 70,
+          "column": 1
+        },
+        {
+          "title": "host signs in, moderates, edits speech and sees links",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3293,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-29T18:43:19.134Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "86d6a544053f1eb9f224-1a7d717075a7f3265f33",
+          "file": "flows.spec.ts",
+          "line": 77,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "smoke.spec.ts",
+      "file": "smoke.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "app boots",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 492,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-29T18:43:09.313Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "4219922fea2e2bd3c691-79fb5fb1d445757b1b76",
+          "file": "smoke.spec.ts",
+          "line": 5,
+          "column": 1
+        },
+        {
+          "title": "unknown event shows not-found or not-configured",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop",
+              "projectName": "desktop",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 431,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-29T18:43:10.083Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "4219922fea2e2bd3c691-e8edafac1adc9b02ee86",
+          "file": "smoke.spec.ts",
+          "line": 12,
+          "column": 1
+        }
+      ]
+    },
+    {
+      "title": "booth.spec.ts",
+      "file": "booth.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "booth renders camera, filters and takes a photo",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "booth",
+              "projectName": "booth",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 14417,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-29T18:43:11.123Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "99e44796632726df2bd7-d18082b6211816e2c910",
+          "file": "booth.spec.ts",
+          "line": 16,
+          "column": 1
+        },
+        {
+          "title": "booth detects a face and places filters",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 600000,
+              "annotations": [
+                {
+                  "type": "skip",
+                  "description": "needs e2e/fixtures/face.y4m and E2E_FACE=1 (slow on software GL)",
+                  "location": {
+                    "file": "/home/runner/work/HLedger/HLedger/e2e/booth.spec.ts",
+                    "line": 34,
+                    "column": 8
+                  }
+                }
+              ],
+              "expectedStatus": "skipped",
+              "projectId": "booth",
+              "projectName": "booth",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 1,
+                  "status": "skipped",
+                  "duration": 55,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-29T18:43:25.691Z",
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "needs e2e/fixtures/face.y4m and E2E_FACE=1 (slow on software GL)",
+                      "location": {
+                        "file": "/home/runner/work/HLedger/HLedger/e2e/booth.spec.ts",
+                        "line": 34,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "attachments": []
+                }
+              ],
+              "status": "skipped"
+            }
+          ],
+          "id": "99e44796632726df2bd7-61e6346b11bd3db2686e",
+          "file": "booth.spec.ts",
+          "line": 32,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-29T18:43:08.459Z",
+    "duration": 17372.007,
+    "expected": 7,
+    "skipped": 1,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}
