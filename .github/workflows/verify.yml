@@ -42,7 +42,11 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - name: Fake camera clip from the fixture photo
-        run: ffmpeg -loglevel error -loop 1 -i e2e/fixtures/face.jpg -t 6 -r 15 -pix_fmt yuv420p -vf "scale=640:480:force_original_aspect_ratio=increase,crop=640:480" e2e/fixtures/face.y4m
+        run: |
+          which ffmpeg || (sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg)
+          ffmpeg -y -loglevel error -loop 1 -i e2e/fixtures/face.jpg -t 6 -r 15 \
+            -vf "scale=640:480:force_original_aspect_ratio=increase,crop=640:480,format=yuv420p" e2e/fixtures/face.y4m
+          ls -la e2e/fixtures
 
       - name: Fetch fonts (published to ci-artifacts for committing)
         run: node scripts/fetch-fonts.mjs
