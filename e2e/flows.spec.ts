@@ -56,21 +56,6 @@ test('guest posts a photo', async ({ page }) => {
   await expect(page.getByText(/on the wall/i)).toBeVisible({ timeout: 30_000 })
 })
 
-test('booth renders camera, filters and takes a photo', async ({ page }) => {
-  await page.goto('/demo/booth')
-  await expect(page.getByRole('button', { name: /tap to start/i })).toBeEnabled({ timeout: 30_000 })
-  await expect(page.getByRole('option').first()).toBeVisible({ timeout: 30_000 })
-  await page.waitForTimeout(1500)
-  await page.screenshot({ path: `${shots}/booth-live.png` })
-  await page.getByRole('option', { name: /top hat/i }).click()
-  await page.getByRole('button', { name: /tap to start/i }).click()
-  await expect(page.getByRole('button', { name: /send to the wall/i })).toBeVisible({ timeout: 15_000 })
-  await page.screenshot({ path: `${shots}/booth-review.png` })
-  await page.getByPlaceholder(/your name/i).fill('Booth Guest')
-  await page.getByRole('button', { name: /send to the wall/i }).click()
-  await expect(page.getByText(/sent!/i)).toBeVisible({ timeout: 30_000 })
-})
-
 test('host screen asks for sign-in', async ({ page }) => {
   await page.goto('/demo/host')
   await expect(page.getByRole('link', { name: /sign in/i })).toBeVisible()

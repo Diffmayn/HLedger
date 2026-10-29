@@ -14,8 +14,8 @@ export default defineConfig({
     reuseExistingServer: !process.env.CI,
   },
   projects: [
-    { name: 'desktop', use: { ...devices['Desktop Chrome'] } },
-    { name: 'mobile', use: { ...devices['Pixel 7'] } },
+    { name: 'desktop', testIgnore: /booth\.spec\.ts/, use: { ...devices['Desktop Chrome'] } },
+    { name: 'mobile', testIgnore: /booth\.spec\.ts/, use: { ...devices['Pixel 7'] } },
     {
       name: 'booth',
       testMatch: /booth\.spec\.ts/,
