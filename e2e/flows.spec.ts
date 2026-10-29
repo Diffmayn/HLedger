@@ -96,6 +96,12 @@ test('host signs in, moderates, edits speech and sees links', async ({ page }) =
   await page.getByRole('button', { name: /restore/i }).first().click()
   await expect(page.getByRole('button', { name: /restore/i })).toHaveCount(0, { timeout: 10_000 })
 
+  // Delete the photo entry (row + Storage files).
+  page.once('dialog', (d) => void d.accept())
+  const photoCard = page.locator('li', { hasText: 'Photo Guest' })
+  await photoCard.getByRole('button', { name: /delete/i }).click()
+  await expect(page.locator('li', { hasText: 'Photo Guest' })).toHaveCount(0, { timeout: 10_000 })
+
   await page.getByRole('button', { name: /links/i }).click()
   await expect(page.getByAltText(/qr code/i).first()).toBeVisible({ timeout: 10_000 })
   await page.screenshot({ path: `${shots}/host-links.png`, fullPage: true })

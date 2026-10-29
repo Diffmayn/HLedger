@@ -107,17 +107,8 @@ $$;
 create trigger entries_rate_limit before insert on public.entries
   for each row execute function public.entries_rate_limit();
 
--- Delete Storage objects when an entry goes away.
-create or replace function public.entries_delete_media()
-returns trigger language plpgsql security definer set search_path = public, storage as $$
-begin
-  delete from storage.objects
-   where bucket_id = 'media' and name in (old.media_path, old.thumb_path);
-  return old;
-end;
-$$;
-create trigger entries_delete_media after delete on public.entries
-  for each row execute function public.entries_delete_media();
+-- Media files are removed by the host client through the Storage API (hosted
+-- Supabase blocks direct deletes from storage.objects).
 
 -- ---------------------------------------------------------------------------
 -- Row level security

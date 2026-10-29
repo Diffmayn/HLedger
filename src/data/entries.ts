@@ -221,6 +221,11 @@ export function useDeleteEntry() {
     mutationFn: async (entry: Entry) => {
       const { error } = await supabase().from('entries').delete().eq('id', entry.id)
       if (error) throw error
+      const paths = [entry.mediaPath, entry.thumbPath].filter((p): p is string => Boolean(p))
+      if (paths.length) {
+        // Best effort: the row is gone either way; orphaned files only cost storage.
+        await supabase().storage.from(MEDIA_BUCKET).remove(paths).catch(() => undefined)
+      }
       return entry
     },
     onSuccess: (entry) => removeEntryFromCache(qc, entry.eventId, entry.id),
