@@ -34,7 +34,12 @@ export default function GuestScreen() {
   const photoInput = useRef<HTMLInputElement>(null)
   const videoInput = useRef<HTMLInputElement>(null)
 
-  useEffect(() => () => media && URL.revokeObjectURL(media.previewUrl), [media])
+  useEffect(
+    () => () => {
+      if (media) URL.revokeObjectURL(media.previewUrl)
+    },
+    [media],
+  )
 
   const allowed = event.settings.allowedKinds
   const canMedia = allowed.includes('photo') || allowed.includes('video')
