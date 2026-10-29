@@ -9,7 +9,7 @@ const MARGIN = 36
 
 function stripUnsupported(text: string): string {
   // Standard fonts are WinAnsi: keep Latin-1 (incl. æøå), drop emoji and other symbols.
-  return text.replace(/[^\u0000-ÿ–—‘’“”…]/g, '').trim()
+  return text.replace(/[^\u0020-\u00ff\n\u2013\u2014\u2018\u2019\u201c\u201d\u2026]/g, '').trim()
 }
 
 function wrap(text: string, font: PDFFont, size: number, width: number): string[] {

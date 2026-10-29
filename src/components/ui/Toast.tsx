@@ -2,7 +2,6 @@ import { CheckCircle2, AlertCircle, Info, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useToast } from './toastStore'
 
-export { toast, useToast } from './toastStore'
 
 const icons = { success: CheckCircle2, error: AlertCircle, info: Info }
 
