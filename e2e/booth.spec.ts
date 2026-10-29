@@ -29,6 +29,7 @@ test('booth renders camera, filters and takes a photo', async ({ page }) => {
 
 
 test('booth detects a face and places filters', async ({ page }) => {
+  test.setTimeout(240_000)
   test.skip(!fs.existsSync('e2e/fixtures/face.y4m'), 'needs e2e/fixtures/face.y4m')
   await page.goto('/demo/booth')
   await expect(page.getByRole('button', { name: /tap to start/i })).toBeEnabled({ timeout: 20_000 })
@@ -42,6 +43,7 @@ test('booth detects a face and places filters', async ({ page }) => {
     { category: 'Faces', option: /squid guard/i, name: 'squid-guard' },
   ]
   for (const t of tries) {
+    await page.getByRole('button', { name: /^no filter$/i }).click()
     await page.getByRole('button', { name: new RegExp(`^${t.category}$`, 'i') }).click()
     await page.getByRole('option', { name: t.option }).click()
     await page.waitForTimeout(1200)

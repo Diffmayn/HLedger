@@ -9,12 +9,12 @@
       "src": "filters/accessories/bow-tie.webp",
       "thumb": "filters/accessories/bow-tie.thumb.webp",
       "width": 12,
-      "aspect": 1,
+      "aspect": 0.5873,
       "anchor": {
         "landmark": 152,
         "offset": [
           0,
-          -5,
+          -5.5,
           -1
         ]
       }
@@ -32,7 +32,7 @@
         "landmark": 1,
         "offset": [
           0,
-          -0.3,
+          -0.4,
           0.8
         ]
       }
@@ -50,7 +50,7 @@
         "landmark": 1,
         "offset": [
           0,
-          -0.3,
+          -0.4,
           0.8
         ]
       }
@@ -63,12 +63,12 @@
       "src": "filters/accessories/dog-tongue.webp",
       "thumb": "filters/accessories/dog-tongue.thumb.webp",
       "width": 5,
-      "aspect": 2.1719,
+      "aspect": 1.0778,
       "anchor": {
         "landmark": 14,
         "offset": [
           0,
-          -2.2,
+          -2.69,
           0.5
         ]
       },
@@ -85,7 +85,7 @@
       "src": "filters/accessories/flower-crown.webp",
       "thumb": "filters/accessories/flower-crown.thumb.webp",
       "width": 19,
-      "aspect": 0.566,
+      "aspect": 0.546,
       "anchor": {
         "landmark": 10,
         "offset": [
@@ -103,12 +103,12 @@
       "src": "filters/accessories/party-horn.webp",
       "thumb": "filters/accessories/party-horn.thumb.webp",
       "width": 9,
-      "aspect": 1,
+      "aspect": 0.256,
       "anchor": {
         "landmark": 13,
         "offset": [
           0,
-          -0.6,
+          -0.5,
           1.5
         ]
       },
@@ -124,13 +124,13 @@
       "type": "sprite",
       "src": "filters/faces/anime-mask.webp",
       "thumb": "filters/faces/anime-mask.thumb.webp",
-      "width": 17,
+      "width": 16,
       "aspect": 1.3605,
       "anchor": {
         "landmark": 168,
         "offset": [
           0,
-          -1.5,
+          -3.27,
           1.5
         ]
       }
@@ -142,13 +142,13 @@
       "type": "sprite",
       "src": "filters/faces/anonymous-mask.webp",
       "thumb": "filters/faces/anonymous-mask.thumb.webp",
-      "width": 17,
+      "width": 16,
       "aspect": 1.3635,
       "anchor": {
         "landmark": 168,
         "offset": [
           0,
-          -1.5,
+          -3.27,
           1.5
         ]
       }
@@ -160,13 +160,13 @@
       "type": "sprite",
       "src": "filters/faces/jason-joker-mask.webp",
       "thumb": "filters/faces/jason-joker-mask.thumb.webp",
-      "width": 17,
-      "aspect": 1.5228,
+      "width": 16,
+      "aspect": 1.5025,
       "anchor": {
         "landmark": 168,
         "offset": [
           0,
-          -1.5,
+          -3.61,
           1.5
         ]
       }
@@ -178,13 +178,13 @@
       "type": "sprite",
       "src": "filters/faces/mask.webp",
       "thumb": "filters/faces/mask.thumb.webp",
-      "width": 17,
+      "width": 16,
       "aspect": 0.7299,
       "anchor": {
         "landmark": 168,
         "offset": [
           0,
-          -1.5,
+          -1.75,
           1.5
         ]
       }
@@ -196,13 +196,13 @@
       "type": "sprite",
       "src": "filters/faces/squid-front-man-mask.webp",
       "thumb": "filters/faces/squid-front-man-mask.thumb.webp",
-      "width": 17,
-      "aspect": 1.3318,
+      "width": 16,
+      "aspect": 1.3316,
       "anchor": {
         "landmark": 168,
         "offset": [
           0,
-          -1.5,
+          -3.2,
           1.5
         ]
       }
@@ -214,13 +214,13 @@
       "type": "sprite",
       "src": "filters/faces/squid-guard-mask.webp",
       "thumb": "filters/faces/squid-guard-mask.thumb.webp",
-      "width": 17,
+      "width": 16,
       "aspect": 1.3657,
       "anchor": {
         "landmark": 168,
         "offset": [
           0,
-          -1.5,
+          -3.28,
           1.5
         ]
       }
@@ -233,12 +233,12 @@
       "src": "filters/glasses/aviator.webp",
       "thumb": "filters/glasses/aviator.thumb.webp",
       "width": 14.5,
-      "aspect": 1,
+      "aspect": 0.4785,
       "anchor": {
         "landmark": 168,
         "offset": [
           0,
-          0.3,
+          -0.3,
           1.5
         ]
       }
@@ -251,12 +251,12 @@
       "src": "filters/glasses/banana-glasses.webp",
       "thumb": "filters/glasses/banana-glasses.thumb.webp",
       "width": 14.5,
-      "aspect": 0.667,
+      "aspect": 0.5762,
       "anchor": {
         "landmark": 168,
         "offset": [
           0,
-          0.3,
+          -0.3,
           1.5
         ]
       }
@@ -269,12 +269,12 @@
       "src": "filters/glasses/cat-eye.webp",
       "thumb": "filters/glasses/cat-eye.thumb.webp",
       "width": 14.5,
-      "aspect": 1,
+      "aspect": 0.2766,
       "anchor": {
         "landmark": 168,
         "offset": [
           0,
-          0.3,
+          -0.3,
           1.5
         ]
       }
@@ -292,7 +292,7 @@
         "landmark": 168,
         "offset": [
           0,
-          0.3,
+          -0.3,
           1.5
         ]
       }
@@ -305,12 +305,12 @@
       "src": "filters/glasses/heart-glasses.webp",
       "thumb": "filters/glasses/heart-glasses.thumb.webp",
       "width": 14.5,
-      "aspect": 1,
+      "aspect": 0.4199,
       "anchor": {
         "landmark": 168,
         "offset": [
           0,
-          0.3,
+          -0.3,
           1.5
         ]
       }
@@ -323,12 +323,12 @@
       "src": "filters/glasses/neon.webp",
       "thumb": "filters/glasses/neon.thumb.webp",
       "width": 14.5,
-      "aspect": 1,
+      "aspect": 0.2857,
       "anchor": {
         "landmark": 168,
         "offset": [
           0,
-          0.3,
+          -0.3,
           1.5
         ]
       }
@@ -341,12 +341,12 @@
       "src": "filters/glasses/nerd-glasses.webp",
       "thumb": "filters/glasses/nerd-glasses.thumb.webp",
       "width": 14.5,
-      "aspect": 1,
+      "aspect": 0.4453,
       "anchor": {
         "landmark": 168,
         "offset": [
           0,
-          0.3,
+          -0.3,
           1.5
         ]
       }
@@ -359,12 +359,12 @@
       "src": "filters/glasses/pixel-glasses.webp",
       "thumb": "filters/glasses/pixel-glasses.thumb.webp",
       "width": 14.5,
-      "aspect": 1,
+      "aspect": 0.3125,
       "anchor": {
         "landmark": 168,
         "offset": [
           0,
-          0.3,
+          -0.3,
           1.5
         ]
       }
@@ -377,12 +377,12 @@
       "src": "filters/glasses/star-glasses.webp",
       "thumb": "filters/glasses/star-glasses.thumb.webp",
       "width": 14.5,
-      "aspect": 1,
+      "aspect": 0.4521,
       "anchor": {
         "landmark": 168,
         "offset": [
           0,
-          0.3,
+          -0.3,
           1.5
         ]
       }
@@ -395,12 +395,12 @@
       "src": "filters/glasses/steampunk.webp",
       "thumb": "filters/glasses/steampunk.thumb.webp",
       "width": 14.5,
-      "aspect": 1,
+      "aspect": 0.3827,
       "anchor": {
         "landmark": 168,
         "offset": [
           0,
-          0.3,
+          -0.3,
           1.5
         ]
       }
@@ -413,12 +413,12 @@
       "src": "filters/hats/banana-hat.webp",
       "thumb": "filters/hats/banana-hat.thumb.webp",
       "width": 16,
-      "aspect": 0.667,
+      "aspect": 0.5762,
       "anchor": {
         "landmark": 10,
         "offset": [
           0,
-          5,
+          3.69,
           -2
         ]
       }
@@ -431,12 +431,12 @@
       "src": "filters/hats/beret.webp",
       "thumb": "filters/hats/beret.thumb.webp",
       "width": 19,
-      "aspect": 1,
+      "aspect": 0.735,
       "anchor": {
         "landmark": 10,
         "offset": [
           0,
-          4,
+          4.89,
           -2.5
         ]
       }
@@ -448,13 +448,13 @@
       "type": "sprite",
       "src": "filters/hats/birthday-hat.webp",
       "thumb": "filters/hats/birthday-hat.thumb.webp",
-      "width": 14,
-      "aspect": 1,
+      "width": 13,
+      "aspect": 1.5,
       "anchor": {
         "landmark": 10,
         "offset": [
           0,
-          7,
+          8.78,
           -2
         ]
       }
@@ -472,7 +472,7 @@
         "landmark": 10,
         "offset": [
           0,
-          3,
+          3.61,
           -3
         ]
       }
@@ -484,13 +484,13 @@
       "type": "sprite",
       "src": "filters/hats/cowboy-hat.webp",
       "thumb": "filters/hats/cowboy-hat.thumb.webp",
-      "width": 22,
-      "aspect": 1,
+      "width": 24,
+      "aspect": 0.6553,
       "anchor": {
         "landmark": 10,
         "offset": [
           0,
-          4,
+          5.5,
           -2
         ]
       }
@@ -503,12 +503,12 @@
       "src": "filters/hats/crown.webp",
       "thumb": "filters/hats/crown.thumb.webp",
       "width": 16,
-      "aspect": 1,
+      "aspect": 0.7101,
       "anchor": {
         "landmark": 10,
         "offset": [
           0,
-          5,
+          5.11,
           -2
         ]
       }
@@ -526,7 +526,7 @@
         "landmark": 10,
         "offset": [
           0,
-          2.5,
+          2.14,
           -3
         ]
       }
@@ -539,12 +539,12 @@
       "src": "filters/hats/gold-crown.webp",
       "thumb": "filters/hats/gold-crown.thumb.webp",
       "width": 16,
-      "aspect": 0.8083,
+      "aspect": 0.8209,
       "anchor": {
         "landmark": 10,
         "offset": [
           0,
-          5,
+          5.91,
           -2
         ]
       }
@@ -556,14 +556,14 @@
       "type": "sprite",
       "src": "filters/hats/green-carnival.webp",
       "thumb": "filters/hats/green-carnival.thumb.webp",
-      "width": 20,
+      "width": 18,
       "aspect": 0.435,
       "anchor": {
-        "landmark": 10,
+        "landmark": 168,
         "offset": [
           0,
-          3,
-          -1
+          0,
+          1.5
         ]
       }
     },
@@ -580,7 +580,7 @@
         "landmark": 168,
         "offset": [
           0,
-          1,
+          0,
           -4
         ]
       }
@@ -592,13 +592,13 @@
       "type": "sprite",
       "src": "filters/hats/party-hat.webp",
       "thumb": "filters/hats/party-hat.thumb.webp",
-      "width": 14,
-      "aspect": 1,
+      "width": 13,
+      "aspect": 1.547,
       "anchor": {
         "landmark": 10,
         "offset": [
           0,
-          7,
+          9.05,
           -2
         ]
       }
@@ -611,12 +611,12 @@
       "src": "filters/hats/top-hat.webp",
       "thumb": "filters/hats/top-hat.thumb.webp",
       "width": 18,
-      "aspect": 1,
+      "aspect": 0.8693,
       "anchor": {
         "landmark": 10,
         "offset": [
           0,
-          6,
+          6.57,
           -2.5
         ]
       }
@@ -629,12 +629,12 @@
       "src": "filters/hats/visor.webp",
       "thumb": "filters/hats/visor.thumb.webp",
       "width": 20,
-      "aspect": 1,
+      "aspect": 0.3222,
       "anchor": {
         "landmark": 10,
         "offset": [
           0,
-          2,
+          1.29,
           0
         ]
       }
@@ -646,13 +646,13 @@
       "type": "sprite",
       "src": "filters/hats/wizard-hat.webp",
       "thumb": "filters/hats/wizard-hat.thumb.webp",
-      "width": 16,
-      "aspect": 1,
+      "width": 18,
+      "aspect": 1.3813,
       "anchor": {
         "landmark": 10,
         "offset": [
           0,
-          8,
+          10.44,
           -2
         ]
       }
@@ -665,12 +665,12 @@
       "src": "filters/moustaches/banana-moustache.webp",
       "thumb": "filters/moustaches/banana-moustache.thumb.webp",
       "width": 7,
-      "aspect": 0.667,
+      "aspect": 0.5762,
       "anchor": {
         "landmark": 164,
         "offset": [
           0,
-          0.2,
+          0,
           1
         ]
       }
@@ -688,7 +688,7 @@
         "landmark": 164,
         "offset": [
           0,
-          0.2,
+          0,
           1
         ]
       }
@@ -701,12 +701,12 @@
       "src": "filters/moustaches/curly.webp",
       "thumb": "filters/moustaches/curly.thumb.webp",
       "width": 7,
-      "aspect": 1,
+      "aspect": 0.1663,
       "anchor": {
         "landmark": 164,
         "offset": [
           0,
-          0.2,
+          0,
           1
         ]
       }
@@ -719,12 +719,12 @@
       "src": "filters/moustaches/full-beard.webp",
       "thumb": "filters/moustaches/full-beard.thumb.webp",
       "width": 14,
-      "aspect": 1,
+      "aspect": 0.5987,
       "anchor": {
         "landmark": 17,
         "offset": [
           0,
-          -1.5,
+          -2.93,
           0.5
         ]
       }
@@ -737,12 +737,12 @@
       "src": "filters/moustaches/goatee.webp",
       "thumb": "filters/moustaches/goatee.thumb.webp",
       "width": 6,
-      "aspect": 1,
+      "aspect": 0.5214,
       "anchor": {
         "landmark": 152,
         "offset": [
           0,
-          1,
+          0.5,
           1
         ]
       }
@@ -755,12 +755,12 @@
       "src": "filters/moustaches/handlebar.webp",
       "thumb": "filters/moustaches/handlebar.thumb.webp",
       "width": 7,
-      "aspect": 1,
+      "aspect": 0.1911,
       "anchor": {
         "landmark": 164,
         "offset": [
           0,
-          0.2,
+          0,
           1
         ]
       }
@@ -773,12 +773,12 @@
       "src": "filters/moustaches/pencil.webp",
       "thumb": "filters/moustaches/pencil.thumb.webp",
       "width": 7,
-      "aspect": 1,
+      "aspect": 0.2047,
       "anchor": {
         "landmark": 164,
         "offset": [
           0,
-          0.2,
+          0,
           1
         ]
       }
@@ -791,12 +791,12 @@
       "src": "filters/moustaches/stubble.webp",
       "thumb": "filters/moustaches/stubble.thumb.webp",
       "width": 13,
-      "aspect": 1,
+      "aspect": 0.3314,
       "anchor": {
         "landmark": 164,
         "offset": [
           0,
-          -2,
+          -2.5,
           0.5
         ]
       }
@@ -809,12 +809,12 @@
       "src": "filters/moustaches/walrus.webp",
       "thumb": "filters/moustaches/walrus.thumb.webp",
       "width": 7,
-      "aspect": 1,
+      "aspect": 0.4092,
       "anchor": {
         "landmark": 164,
         "offset": [
           0,
-          0.2,
+          0,
           1
         ]
       }
